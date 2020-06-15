@@ -4,10 +4,10 @@ Google map with search functionality.
 Add it to package.json as a dependency
 
     General
-    "native-support-handler": "git+ssh://git@github.com/bharatpe/g-map.git"
+    "g-map": "git+ssh://git@github.com/bharatpe/g-map.git"
     
     With Authtoken
-    "native-support-handler": "git+https://[AUTH_TOKEN]:x-oauth-basic@github.com/bharatpe/g-map.git"
+    "g-map": "git+https://[AUTH_TOKEN]:x-oauth-basic@github.com/bharatpe/g-map.git"
 ## Usage
 Basic use:
 
