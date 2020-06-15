@@ -46,8 +46,7 @@ export default class GMap extends React.PureComponent {
     fullscreenControl: false,
     streetViewControl: false,
     clickableIcons: false,
-    mapTypeId: "roadmap", // ["hybrid, roadmap, satellite, terrain"]
-    libraries: "places"
+    mapTypeId: "roadmap" // ["hybrid, roadmap, satellite, terrain"]
   };
 
   // define component prop types
@@ -65,6 +64,7 @@ export default class GMap extends React.PureComponent {
     markerIcon: PropTypes.string,
     searchPlaceHolder: PropTypes.string,
     searchClassName: PropTypes.string,
+    libraries: PropTypes.string,
     onSelect: PropTypes.func
   };
 
@@ -84,6 +84,7 @@ export default class GMap extends React.PureComponent {
       "https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png",
     searchPlaceHolder: "Search here",
     searchClassName: "",
+    libraries: "places",
     onSelect: () => {}
   };
 
@@ -156,8 +157,7 @@ export default class GMap extends React.PureComponent {
       };
 
       const scriptElem = document.createElement("script");
-      const librariesOptions =
-        this.props.mapOptions.libraries || GMap.defaultMapOptions.libraries;
+      const librariesOptions = this.props.libraries;
       scriptElem.src = `https://maps.googleapis.com/maps/api/js?key=${this.props.appKey}&callback=initMapScript&libraries=${librariesOptions}`;
       scriptElem.setAttribute("id", "google-map");
       document.querySelector("head").appendChild(scriptElem);

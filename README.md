@@ -30,7 +30,8 @@ Basic use:
 | appKey | google map app key | It's a mandatory options
 |lat| default latitude of map | 28.7041
 |lng| default logitude of map | 77.1025
-|mapOptions| google map option | zoom:  15, zoomControl:  false, mapTypeControl:  false, fullscreenControl:  false, streetViewControl:  false, clickableIcons:  false, mapTypeId:  "roadmap", libraries:  "places"
+|mapOptions| google map options that you can change or add more | zoom:  15, zoomControl:  false, mapTypeControl:  false, fullscreenControl:  false, streetViewControl:  false, clickableIcons:  false, mapTypeId:  "roadmap"
+|libraries| add more funcationality on google map | places
 |mapClassName| custom class name for map element| 
 |hasMarker| show marker in map | true
 |markerIcon| map marker icon | https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png
@@ -59,5 +60,6 @@ Basic use:
 ![map search image](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/map-search2.jpg?token=AOWSXMW35JZIB46KBJUZD3K66DZRI)
   
   ![map search container](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/map-search1.jpg?token=AOWSXMRR2GFIWJR625KQHFS66DZUK)
+
 ## License
 BharatPe © [BharatPe TM](https://github.com/BharatPe TM)
