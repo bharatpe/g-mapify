@@ -23,7 +23,7 @@ Basic use:
 	    )
     }
 ### Example: Basic map
-   ![Basic Map Image](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/basic-map.png?token=AOWSXMSGWSD3E2HFNB6OD4S66CMAK)
+ ![basic map](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/basic-map.jpg?token=AOWSXMRY6R7QYTRUABNP5BC66D4TC)
 ## Options
 |  Props | Description  | Default value
 |--|--|--|
