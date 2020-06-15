@@ -37,7 +37,7 @@ const App = () => {
       :
       (
         // example with additional options
-        <GMap key={2} mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-100" hasSearch />
+        <GMap key={2} mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-100" hasSearch onSelect={onMapSelect} />
       )
     }
 
