@@ -8,6 +8,8 @@ Add it to package.json as a dependency
     
     With Authtoken
     "g-map": "git+https://[AUTH_TOKEN]:x-oauth-basic@github.com/bharatpe/g-map.git"
+## Note: For Contributors
+This repo build with [create-react-library](https://github.com/transitive-bullshit/create-react-library)
 ## Usage
 Basic use:
 
@@ -21,7 +23,7 @@ Basic use:
 	    )
     }
 ### Example: Basic map
-   ![Basic Map Image](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/basic-map.jpg?token=AOWSXMV3ZXKBA6H54TGRXEK66CMR4)
+   ![Basic Map Image](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/basic-map.png?token=AOWSXMSGWSD3E2HFNB6OD4S66CMAK)
 ## Options
 |  Props | Description  | Default value
 |--|--|--|
@@ -40,6 +42,22 @@ Basic use:
 |searchClassName| custom class name of search container
 |onSelect| trigger whenever map position changed (it's a callback)| return *status: [true/false], data: [map data object], mapStatus: [map native status]*
 
-
+## Example with options
+    import  React from  'react';
+    import { GMap } from  'g-map';
+    import  'g-map/dist/index.css';
+    
+    const  App = () => {
+        const  onMapSelect = useCallback((status, data)=> {
+            console.warn(data);
+        }, []);
+        
+	    return (
+		    <GMap appKey="[google-map-key]" hasSearch onSelect={onMapSelect}/>
+	    )
+    }
+![map search image](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/map-search2.jpg?token=AOWSXMW35JZIB46KBJUZD3K66DZRI)
+  
+  ![map search container](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/map-search1.jpg?token=AOWSXMRR2GFIWJR625KQHFS66DZUK)
 ## License
 BharatPe © [BharatPe TM](https://github.com/BharatPe TM)
