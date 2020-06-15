@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useRef } from 'react'
 
-import { GMap } from 'g-map'
+import { GMap, addressFormatter } from 'g-map'
 import 'g-map/dist/index.css'
 // import InputDefault from './components/Input';
 
@@ -14,7 +14,11 @@ const App = () => {
   const refs = useRef(null);
 
   const onMapSelect = useCallback((status, data) => {
-    console.warn(data);
+    console.warn('Map Data', data);
+
+    // get formatted address from google map address_components
+    const formattedAddress = addressFormatter(data.address_components);
+    console.warn('formated address', formattedAddress);
   }, []);
 
   const onMapButtonClicked = useCallback(() => {
