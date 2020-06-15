@@ -9,20 +9,37 @@ const App = () => {
     zoom: 15
   };
 
-  const [showSearch, setShowSearch] = useState(false);
+  const [showSearchMap, setShowSearchMap] = useState(false);
   const [inputVal, setInputval] = useState('');
   const refs = useRef(null);
 
   const onMapSelect = useCallback((status, data) => {
     console.warn(data);
-    setInputval(data.formatted_address);
   }, []);
+
+  const onMapButtonClicked = useCallback(() => {
+    setShowSearchMap(() => {
+      return !showSearchMap;
+    });
+  }, [showSearchMap]);
 
   return (
   <>
-    <GMap mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-20">
-      
-    </GMap>
+    <button onClick={onMapButtonClicked} disabled={!showSearchMap}>Basic Map</button>
+    <button onClick={onMapButtonClicked} disabled={showSearchMap}>Search Map</button>
+    
+     { 
+      !showSearchMap ?
+      (
+        // Basic example
+        <GMap key={1} mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-100" />
+      )
+      :
+      (
+        // example with additional options
+        <GMap key={2} mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-100" hasSearch />
+      )
+    }
 
   </>
   )

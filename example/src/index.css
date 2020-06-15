@@ -19,8 +19,8 @@ code {
   top: 100%;
 }
 
-.h-20 {
-  height: 100vh;
+.h-100 {
+  height: 80vh;
 }
 
 .custom-search-box.material {
