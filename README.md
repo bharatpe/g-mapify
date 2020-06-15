@@ -50,16 +50,34 @@ Basic use:
     
     const  App = () => {
         const  onMapSelect = useCallback((status, data)=> {
-            console.warn(data);
+            if (status) {
+	            console.warn(status, data);
+	        }
         }, []);
         
 	    return (
 		    <GMap appKey="[google-map-key]" hasSearch onSelect={onMapSelect}/>
 	    )
     }
+ Note: If *status* is getting *false* that means something happened bad on location search.
+### See below pictures
 ![map search image](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/map-search2.jpg?token=AOWSXMW35JZIB46KBJUZD3K66DZRI)
   
   ![map search container](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/map-search1.jpg?token=AOWSXMRR2GFIWJR625KQHFS66DZUK)
+## Address Formatter
+You can get City, Pincode, State etc. from *address_components* using **addressFormatter** method. This method transfrom *address_components* array data into *object*.
+
+    import { GMap, addressFormatter } from  'g-map'
+    
+    const  onMapSelect = useCallback((status, data) => {
+        if (status) {
+	        console.warn('Map Data', data);
+    
+		    // get formatted address from google map address_components
+		    const  formattedAddress = addressFormatter(data.address_components);
+		    console.warn('formated address', formattedAddress);
+		}
+    }, []);
 
 ## License
 BharatPe © [BharatPe TM](https://github.com/BharatPe TM)
