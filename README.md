@@ -1,5 +1,5 @@
 # g-map
-Google map with search functionality.
+Google map with some additional functionality.
 # Getting Started
 Add it to package.json as a dependency
 
