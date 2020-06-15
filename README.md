@@ -40,7 +40,7 @@ Basic use:
 |inputClassName| custom class name for Search input | 
 |searchPlaceHolder| placeholder of search box | Search here
 |searchClassName| custom class name of search container
-|onSelect| trigger whenever map position changed (it's a callback)| return *status: [true/false], data: [map data object], mapStatus: [map native status]*
+|onSelect| trigger whenever map position changed (return *status: [true/false], data: [map data object], mapStatus: [map native status]*)| 
 
 ## Example with options
     import  React from  'react';
