@@ -1,13 +1,13 @@
 # g-map
-Google map with some additional functionality.
+Google map with search functionality.
 # Getting Started
 Add it to package.json as a dependency
 
     General
-    "g-map": "git+ssh://git@github.com/bharatpe/g-map.git"
+    "native-support-handler": "git+ssh://git@github.com/bharatpe/g-map.git"
     
     With Authtoken
-    "g-map": "git+https://[AUTH_TOKEN]:x-oauth-basic@github.com/bharatpe/g-map.git"
+    "native-support-handler": "git+https://[AUTH_TOKEN]:x-oauth-basic@github.com/bharatpe/g-map.git"
 ## Usage
 Basic use:
 
@@ -20,7 +20,8 @@ Basic use:
 		    <GMap appKey="[google-map-key]" />
 	    )
     }
-
+### Example: Basic map
+   ![Basic Map Image](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/basic-map.png?token=AOWSXMSGWSD3E2HFNB6OD4S66CMAK)
 ## Options
 |  Props | Description  | Default value
 |--|--|--|
@@ -34,7 +35,7 @@ Basic use:
 |hasSearch| apply search in map | false
 |mapSearchPlace| map search input box place (required a valid selector name like (#id, .class)) | bottom of the map
 |debounceTime| search debounce time (unit *ms*) | 2000
-|inputClassName| Search input custom class name | 
+|inputClassName| custom class name for Search input | 
 |searchPlaceHolder| placeholder of search box | Search here
 |searchClassName| custom class name of search container
 |onSelect| trigger whenever map position changed (it's a callback)| return *status: [true/false], data: [map data object], mapStatus: [map native status]*
