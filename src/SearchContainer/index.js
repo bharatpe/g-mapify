@@ -62,7 +62,7 @@ export default class SearchContainer extends React.PureComponent {
 
   render() {
     const { showSearch } = this.state;
-    const { placeHolder, className } = this.props;
+    const { placeholder, className } = this.props;
 
     return (
       <div
@@ -82,7 +82,7 @@ export default class SearchContainer extends React.PureComponent {
             className={styles.searchTextbox}
             onChange={this.onSearchChange}
             ref={this.inputRef}
-            placeholder={placeHolder}
+            placeholder={placeholder}
           />
         </div>
 
