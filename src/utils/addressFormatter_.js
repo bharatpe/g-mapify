@@ -1,31 +1,44 @@
-// convert google map components array into object for easy to use
-function addressFormatter_(components = []) {
-  return formatter(components);
-}
+const ADDRESS_TYPE_POSTAL_CODE = "postal_code";
+const ADDRESS_TYPE_COUNTRY = "country";
+const ADDRESS_TYPE_ADMIN_LEVEL_1 = "administrative_area_level_1";
+const ADDRESS_TYPE_LOCALITY = "locality";
+const ADDRESS_TYPE_SUB_LOCALITY = "sublocality";
 
-// format google map address components using recursion function
-function formatter(components = [], currentPos = 0, returnObj = {}) {
+/**
+ * @name formatter
+ * @param {Array} components
+ * @param {Int} currentPos
+ * @param {Object} returnObj
+ * @description format google map address components using recursion function
+ */
+const formatter = (components = [], currentPos = 0, returnObj = {}) => {
+  if (components.length < 1) return returnObj;
+
   const component = components[currentPos];
 
+  if (!component) return returnObj;
+
+  const { long_name: longName, types } = component;
+
   if (components.length > currentPos) {
-    for (const type of component.types) {
+    for (const type of types) {
       switch (type) {
-        case "postal_code":
-          returnObj.pin = component.long_name;
+        case ADDRESS_TYPE_POSTAL_CODE:
+          returnObj.pin = longName;
           break;
-        case "country":
-          returnObj.country = component.long_name;
+        case ADDRESS_TYPE_COUNTRY:
+          returnObj.country = longName;
           break;
-        case "administrative_area_level_1":
-          returnObj.state = component.long_name;
+        case ADDRESS_TYPE_ADMIN_LEVEL_1:
+          returnObj.state = longName;
           break;
-        case "locality":
-          returnObj.locality = component.long_name;
+        case ADDRESS_TYPE_LOCALITY:
+          returnObj.locality = longName;
           break;
-        case "sublocality":
+        case ADDRESS_TYPE_SUB_LOCALITY:
           returnObj.sublocality = returnObj.sublocality
-            ? `${returnObj.sublocality}, ${component.long_name}`
-            : component.long_name;
+            ? `${returnObj.sublocality}, ${longName}`
+            : longName;
           break;
       }
     }
@@ -34,6 +47,13 @@ function formatter(components = [], currentPos = 0, returnObj = {}) {
   } else {
     return returnObj;
   }
-}
+};
+
+/**
+ * @name addressFormatter_
+ * @param {Array} components
+ * @description convert google map components array into object for easy to use
+ */
+const addressFormatter_ = (components = []) => formatter(components);
 
 export default addressFormatter_;

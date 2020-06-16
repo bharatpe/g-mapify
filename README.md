@@ -84,14 +84,14 @@ Basic use:
 ## Address Formatter
 You can get City, Pincode, State etc. from *address_components* using **addressFormatter** method. This method transfrom *address_components* array data into *object*.
 
-    import { GMapify, addressFormatter } from  'g-mapify'
+    import { GMapify, AddressFormatter } from  'g-mapify'
     
     const  onMapSelect = useCallback((status, data) => {
         if (status) {
 	        console.warn('Map Data', data);
     
 		    // get formatted address from google map address_components
-		    const  formattedAddress = addressFormatter(data.address_components);
+		    const  formattedAddress = AddressFormatter(data.address_components);
 		    console.warn('formated address', formattedAddress);
 		}
     }, []);
