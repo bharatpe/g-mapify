@@ -4,20 +4,21 @@ Flexible react google map, Which more options for search, pick & select.
 ![g-mapify](g-mapify.png)
 
 # Getting Started
-Add it to package.json as a dependency
 
-    General
-    yarn add g-mapify
-    
-    or 
+```javascript
+yarn add g-mapify
+```
 
-    npm i g-mapify
-    
+or
+
+```javascript
+npm i g-mapify
+```
 
 
 ## Usage
 Basic use:
-
+```javascript
     import  React from  'react';
     import { GMapify } from  'g-mapify';
     import  'g-mapify/dist/index.css';
@@ -27,7 +28,7 @@ Basic use:
 		    <GMapify appKey="[google-map-key]" />
 	    )
     }
-
+```
 
 ### Example: Basic map
 ![basic map image](https://github.com/bharatpe/react-g-map/blob/master/example/images/basic-map.jpg?raw=true)
@@ -52,6 +53,7 @@ Basic use:
 |onSelect| trigger whenever map position changed (return *status: [true/false], data: [map data object], mapStatus: [map native status]*)| 
 
 ## Example with options
+```javascript
     import  React from  'react';
     import { GMapify } from  'g-mapify';
     import  'g-mapify/dist/index.css';
@@ -67,11 +69,16 @@ Basic use:
 		    <GMapify appKey="[google-map-key]" hasSearch onSelect={onMapSelect}/>
 	    )
     }
- Note: If *status* is getting *false* that means something happened bad on location search.
+```
+ #### Note
+ If *status* is getting *false* that means something happened bad on location search.
+
+
 ### See below pictures
 ![Map Search image](https://github.com/bharatpe/react-g-map/blob/master/example/images/map-search2.jpg?raw=true)
 
 ![Map Search container](https://github.com/bharatpe/react-g-map/blob/master/example/images/map-search1.jpg?raw=true)
+
 
 ## Address Formatter
 You can get City, Pincode, State etc. from *address_components* using **addressFormatter** method. This method transfrom *address_components* array data into *object*.
