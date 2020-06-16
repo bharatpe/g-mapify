@@ -1,7 +1,8 @@
 # g-mapify [![NPM version](https://img.shields.io/npm/v/g-mapify.svg)](https://www.npmjs.com/package/g-mapify) [![Downloads](http://img.shields.io/npm/dm/g-mapify.svg)](https://npmjs.org/package/g-mapify)
 Flexible react google map, Which more options for search, pick & select.
 
-![g-mapify](g-mapify.png)
+![g-mapify](https://github.com/bharatpe/g-mapify/blob/master/g-mapify.png)
+
 
 # Getting Started
 
@@ -96,9 +97,16 @@ You can get City, Pincode, State etc. from *address_components* using **addressF
     }, []);
 
 
+# Releases
+Here [Releases](https://github.com/bharatpe/g-mapify/blob/master/releases.md)
+
     
 ## Note: For Contributors
 This repo build with [create-react-library](https://github.com/transitive-bullshit/create-react-library)
+
+
+## Contributors
+Here [Contributors](https://github.com/bharatpe/g-mapify/graphs/contributors)
 
 
 ## License
