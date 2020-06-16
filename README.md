@@ -31,7 +31,7 @@ Basic use:
 ```
 
 ### Example: Basic map
-![basic map image](https://github.com/bharatpe/react-g-map/blob/master/example/images/basic-map.jpg?raw=true)
+![basic map image](https://github.com/bharatpe/react-g-map/blob/master/example/images/basic-map.png?raw=true)
 
 ## Options
 |  Props | Description  | Default value
@@ -75,9 +75,9 @@ Basic use:
 
 
 ### See below pictures
-![Map Search image](https://github.com/bharatpe/react-g-map/blob/master/example/images/map-search2.jpg?raw=true)
+![Map Search image](https://github.com/bharatpe/react-g-map/blob/master/example/images/map-search2.png?raw=true)
 
-![Map Search container](https://github.com/bharatpe/react-g-map/blob/master/example/images/map-search1.jpg?raw=true)
+![Map Search container](https://github.com/bharatpe/react-g-map/blob/master/example/images/map-search1.png?raw=true)
 
 
 ## Address Formatter
