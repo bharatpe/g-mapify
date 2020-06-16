@@ -1,5 +1,8 @@
-# g-mapify
-Google map with some additional functionality.
+# g-mapify [![NPM version](https://img.shields.io/npm/v/g-mapify.svg)](https://www.npmjs.com/package/g-mapify) [![Downloads](http://img.shields.io/npm/dm/g-mapify.svg)](https://npmjs.org/package/g-mapify)
+Flexible react google map, Which more options for search, pick & select.
+
+![g-mapify](g-mapify.png)
+
 # Getting Started
 Add it to package.json as a dependency
 
@@ -8,20 +11,22 @@ Add it to package.json as a dependency
     
     With Authtoken
     "g-mapify": "git+https://[AUTH_TOKEN]:x-oauth-basic@github.com/bharatpe/g-mapify.git"
-## Note: For Contributors
-This repo build with [create-react-library](https://github.com/transitive-bullshit/create-react-library)
+
+
 ## Usage
 Basic use:
 
     import  React from  'react';
-    import { GMap } from  'g-mapify';
+    import { GMapify } from  'g-mapify';
     import  'g-mapify/dist/index.css';
     
     const  App = () => {
 	    return (
-		    <GMap appKey="[google-map-key]" />
+		    <GMapify appKey="[google-map-key]" />
 	    )
     }
+
+
 ### Example: Basic map
 ![basic map image](https://github.com/bharatpe/react-g-map/blob/master/example/images/basic-map.jpg?raw=true)
 
@@ -46,7 +51,7 @@ Basic use:
 
 ## Example with options
     import  React from  'react';
-    import { GMap } from  'g-mapify';
+    import { GMapify } from  'g-mapify';
     import  'g-mapify/dist/index.css';
     
     const  App = () => {
@@ -57,7 +62,7 @@ Basic use:
         }, []);
         
 	    return (
-		    <GMap appKey="[google-map-key]" hasSearch onSelect={onMapSelect}/>
+		    <GMapify appKey="[google-map-key]" hasSearch onSelect={onMapSelect}/>
 	    )
     }
  Note: If *status* is getting *false* that means something happened bad on location search.
@@ -69,7 +74,7 @@ Basic use:
 ## Address Formatter
 You can get City, Pincode, State etc. from *address_components* using **addressFormatter** method. This method transfrom *address_components* array data into *object*.
 
-    import { GMap, addressFormatter } from  'g-mapify'
+    import { GMapify, addressFormatter } from  'g-mapify'
     
     const  onMapSelect = useCallback((status, data) => {
         if (status) {
@@ -80,6 +85,12 @@ You can get City, Pincode, State etc. from *address_components* using **addressF
 		    console.warn('formated address', formattedAddress);
 		}
     }, []);
+
+
+    
+## Note: For Contributors
+This repo build with [create-react-library](https://github.com/transitive-bullshit/create-react-library)
+
 
 ## License
 BharatPe © [BharatPe TM](https://github.com/BharatPe TM)

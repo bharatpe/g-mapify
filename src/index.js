@@ -1,2 +1,2 @@
-export { default as GMap } from "./Gmap";
+export { default as GMapify } from "./Gmapify";
 export { default as addressFormatter } from "./utils/addressFormatter_";

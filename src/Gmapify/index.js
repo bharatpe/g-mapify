@@ -28,7 +28,7 @@ const SearchInputComponent = (props) => {
   );
 };
 
-const GMap = (props) => {
+const GMapify = (props) => {
   const {
     appKey,
     lat,
@@ -76,9 +76,9 @@ const GMap = (props) => {
    * @description add google map script file to project
    */
   const insertMapScript = () => {
-    const isGMapScriptAdded = document.head.querySelector("#google-map");
+    const isGMapifyScriptAdded = document.head.querySelector("#google-map");
 
-    if (!isGMapScriptAdded) {
+    if (!isGMapifyScriptAdded) {
       // error occured in Google Map loading
       window.gm_authFailure = () => {
         setIsMapLoadingFailed(true);
@@ -442,7 +442,7 @@ const GMap = (props) => {
 };
 
 // define component prop types
-GMap.propTypes = {
+GMapify.propTypes = {
   appKey: PropTypes.string,
   lat: PropTypes.number,
   lng: PropTypes.number,
@@ -462,7 +462,7 @@ GMap.propTypes = {
 };
 
 // define default values of prop types
-GMap.defaultProps = {
+GMapify.defaultProps = {
   appKey: "",
   lat: DEFAULT_LAT_LONG.lat,
   lng: DEFAULT_LAT_LONG.lng,
@@ -481,4 +481,4 @@ GMap.defaultProps = {
   children: null
 };
 
-export default GMap;
+export default GMapify;

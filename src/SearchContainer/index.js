@@ -7,7 +7,7 @@ import PropTypes from "prop-types";
 /**
  * @name SearchContainer
  * @param {@} props
- * @description Address search container for GMap
+ * @description Address search container for GMapify
  */
 const SearchContainer = (props) => {
   const { placeholder, className } = props;
