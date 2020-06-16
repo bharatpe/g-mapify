@@ -1,7 +1,7 @@
 {
   "name": "g-mapify",
-  "version": "1.1.0",
-  "description": "google map for React projects",
+  "version": "1.1.1",
+  "description": "Flexible react google map with more options of search, pick & select.",
   "author": "BharatPe TM",
   "license": "ISC",
   "repository": "https://github.com/bharatpe/g-mapify",
