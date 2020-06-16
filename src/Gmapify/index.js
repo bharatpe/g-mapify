@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import styles from "./style.css";
 import cx from "classnames";
@@ -28,206 +28,267 @@ const SearchInputComponent = (props) => {
   );
 };
 
-const GMapify = (props) => {
-  const {
-    appKey,
-    lat,
-    lng,
-    mapOptions,
-    mapClassName,
-    hasMarker,
-    hasSearch,
-    mapSearchPlace,
-    debounceTime,
-    inputClassName,
-    markerIcon,
-    searchPlaceHolder,
-    searchClassName,
-    libraries,
-    children,
-    onSelect
-  } = props;
-
-  const [searchResults, setSearchResults] = useState([]);
-  const [showMapSearch, setShowMapSearch] = useState(false);
-  const [searchState, setSearchState] = useState(SEARCH_STATE.LOAD);
-  const [isMapLoadingFailed, setIsMapLoadingFailed] = useState(false);
-  const [mapLastPosition, setMapLastPosition] = useState({});
-  const [addressInput, setAddressInput] = useState("");
-  const [mapInstance, setMapInstance] = useState(null);
-
-  // store google map render element instance
-  const mapElemRef = useRef(null);
-  let defaultSearchPlace = useRef(null);
-
-  /**
-   * @name mapInitSuccess
-   * @description google map script file added successfully
-   */
-  const mapInitSuccess = () => {
-    if (mapSearchPlace) {
-      defaultSearchPlace = { current: document.querySelector(mapSearchPlace) };
-    }
-    createMapInstance(lat, lng);
+export default class GMap extends React.PureComponent {
+  // define component prop types
+  static propTypes = {
+    appKey: PropTypes.string,
+    lat: PropTypes.number,
+    lng: PropTypes.number,
+    mapOptions: PropTypes.object,
+    mapClassName: PropTypes.string,
+    hasMarker: PropTypes.bool,
+    hasSearch: PropTypes.bool,
+    mapSearchPlace: PropTypes.string,
+    debounceTime: PropTypes.number,
+    inputClassName: PropTypes.string,
+    markerIcon: PropTypes.string,
+    searchPlaceHolder: PropTypes.string,
+    searchClassName: PropTypes.string,
+    libraries: PropTypes.string,
+    onSelect: PropTypes.func
   };
 
-  /**
-   * @name insertMapScript
-   * @description add google map script file to project
-   */
-  const insertMapScript = () => {
-    const isGMapifyScriptAdded = document.head.querySelector("#google-map");
+  // define default values of prop types
+  static defaultProps = {
+    appKey: "",
+    lat: DEFAULT_LAT_LONG.lat,
+    lng: DEFAULT_LAT_LONG.lng,
+    mapOptions: {},
+    mapClassName: "",
+    hasMarker: DEFAULT_HAS_MARKER,
+    hasSearch: DEFAULT_HAS_SEARCH,
+    mapSearchPlace: "",
+    debounceTime: DEFAULT_DEBOUNCE_TIME, // time in ms
+    inputClassName: "",
+    markerIcon: DEFAULT_MARKER_ICON,
+    searchPlaceHolder: DEFAULT_SEARCH_PLACEHOLDER,
+    searchClassName: "",
+    libraries: DEFAULT_LIBRARY_MODE,
+    onSelect: () => {},
+    children: null
+  };
 
-    if (!isGMapifyScriptAdded) {
+  // store google map instance
+  mapInstance = null;
+
+  // store google map render element instance
+  mapElemRef = null;
+
+  // store map default search place element instance
+  defaultSearchPlace = null;
+
+  // store map last position
+  mapLastPosition = {};
+
+  // store map formatted address
+  addressInput = "";
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      searchResults: [],
+      showMapSearch: false,
+      searchState: SEARCH_STATE.LOAD,
+      isMapLoadingFailed: false
+    };
+
+    this.mapElemRef = React.createRef();
+    this.defaultSearchPlace = React.createRef();
+
+    this.onChangeAddressInput = this.onChangeAddressInput.bind(this);
+
+    // implement debounce time when user search location
+    this.searchByQueryDebounce = debounce(
+      this.searchByQueryDebounce,
+      this.props.debounceTime
+    );
+    this.showSearchInput = this.showSearchInput.bind(this);
+    this.closeMapSerach = this.closeMapSerach.bind(this);
+    this.selectMapItem = this.selectMapItem.bind(this);
+  }
+
+  componentDidMount() {
+    if (this.props.appKey) {
+      // call to insert google map script
+      this.insertMapScript();
+
+      // google map callback
+      window.initMapScript = (event) => {
+        this.mapInitSuccess();
+      };
+    } else {
+      console.error("google map appKey not found!!!");
+    }
+  }
+
+  // add google map script file to project
+  insertMapScript() {
+    const isGMapScriptAdded = document.head.querySelector("#google-map");
+
+    if (!isGMapScriptAdded) {
       // error occured in Google Map loading
       window.gm_authFailure = () => {
-        setIsMapLoadingFailed(true);
-        sendToParent(false, { message: MSG_CONST.MAP_NOT_LOADED }, -1);
+        this.setState({
+          isMapLoadingFailed: true
+        });
+
+        this.sendToParent(false, { message: MSG_CONST.MAP_NOT_LOADED }, -1);
       };
 
       const scriptElem = document.createElement("script");
-      scriptElem.src = `https://maps.googleapis.com/maps/api/js?key=${appKey}&callback=initMapScript&libraries=${libraries}`;
+      const librariesOptions = this.props.libraries;
+      scriptElem.src = `https://maps.googleapis.com/maps/api/js?key=${this.props.appKey}&callback=initMapScript&libraries=${librariesOptions}`;
       scriptElem.setAttribute("id", "google-map");
       document.querySelector("head").appendChild(scriptElem);
     } else {
       // skip to add google map script when already added
-      mapInitSuccess();
+      this.mapInitSuccess();
     }
-  };
+  }
 
-  /**
-   * @name createMapInstance
-   * @param {Float} lat
-   * @param {Float} lng
-   * @description create map instance
-   */
-  const createMapInstance = (lat, lng) => {
+  // google map script file added successfully
+  mapInitSuccess() {
+    const mapSearchPlaceElem = this.props.mapSearchPlace;
+    if (mapSearchPlaceElem) {
+      this.defaultSearchPlace = {
+        current: document.querySelector(mapSearchPlaceElem)
+      };
+    }
+    this.createMapInstance(this.props.lat, this.props.lng);
+  }
+
+  // create map instance
+  createMapInstance(lat, lng) {
     if (!window.google) {
       console.error("google map library not found!");
       return;
     }
 
+    const { props } = this;
+    const latLng = new window.google.maps.LatLng(lat, lng);
     const center = {
-      center: new window.google.maps.LatLng(lat, lng)
+      center: latLng
     };
 
     // create google map instance
-    console.log("MAP INSTANXE", mapElemRef.current);
+    if (this.mapElemRef.current) {
+      this.mapInstance = new window.google.maps.Map(this.mapElemRef.current, {
+        ...center,
+        ...DEFAULT_MAP_OPTIONS,
+        ...props.mapOptions
+      });
 
-    if (mapElemRef.current) {
-      setMapInstance(
-        new window.google.maps.Map(mapElemRef.current, {
-          ...center,
-          ...DEFAULT_MAP_OPTIONS,
-          ...mapOptions
-        })
-      );
+      // add marker icon
+      if (props.hasMarker) {
+        this.addEvents();
+      }
+
+      // set map postion to according to porps lat/lng
+      this.setMapPosition(this.props.lat, this.props.lng);
+
+      // add marker icon
+      if (props.hasSearch) {
+        this.addSearchBox();
+      }
     }
-  };
+  }
 
-  /**
-   * @name addSearchBox
-   * @description add search box to map
-   */
-  const addSearchBox = () => {
-    if (hasSearch) {
-      if (defaultSearchPlace.current) {
+  // add search box to map
+  addSearchBox() {
+    if (this.props.hasSearch) {
+      if (this.defaultSearchPlace.current) {
         ReactDOM.render(
           <SearchInputComponent
-            value={addressInput}
-            onFocus={() => setShowMapSearch(true)}
-            className={inputClassName}
+            value={this.addressInput}
+            onFocus={this.showSearchInput}
+            className={this.props.inputClassName}
           />,
-          defaultSearchPlace.current
+          this.defaultSearchPlace.current
         );
       } else {
         console.error(
           "mapSearchPlace element not found!",
           "Selector = ",
-          mapSearchPlace
+          this.props.mapSearchPlace
         );
       }
     }
-  };
+  }
 
-  /**
-   * @name addEvents
-   * @description add events to google map
-   */
-  const addEvents = () => {
-    if (mapInstance && hasMarker) {
+  // add events to google map
+  addEvents() {
+    if (this.mapInstance) {
       // bind dragend event for fetch map center lat long
-      mapInstance.addListener("dragend", () => {
-        setMapPosition(mapInstance.center.lat(), mapInstance.center.lng());
+      this.mapInstance.addListener("dragend", () => {
+        this.setMapPosition(
+          this.mapInstance.center.lat(),
+          this.mapInstance.center.lng()
+        );
       });
 
       // bind zoom change event because always need to zoom from center
-      mapInstance.addListener("zoom_changed", () => {
-        setMapPosition(mapLastPosition.lat, mapLastPosition.lng);
+      this.mapInstance.addListener("zoom_changed", () => {
+        this.setMapPosition(this.mapLastPosition.lat, this.mapLastPosition.lng);
       });
     }
-  };
+  }
 
-  /**
-   * @name removeEvents
-   * @description remove events from google map
-   */
-  const removeEvents = () => {
-    if (window.google && mapInstance) {
-      window.google.maps.event.clearListeners(mapInstance, "dragend");
-      window.google.maps.event.clearListeners(mapInstance, "zoom_changed");
+  // remove events from google map
+  removeEvents() {
+    if (window.google) {
+      window.google.maps.event.clearListeners(this.mapInstance, "dragend");
+      window.google.maps.event.clearListeners(this.mapInstance, "zoom_changed");
     }
-  };
+  }
 
-  /**
-   * @name setMapPosition
-   * @param {Float} lat
-   * @param {Float} lng
-   * @description set google map position
-   */
-  const setMapPosition = (lat, lng) => {
+  // set google map position
+  setMapPosition(lat, lng) {
     const position = {
       lat: lat,
       lng: lng
     };
 
-    mapInstance.setCenter(position);
-    mapInstance.panTo(position);
+    this.mapInstance.setCenter(position);
+    this.mapInstance.panTo(position);
 
     // get address only when previous and current lat/lng different
     if (
-      mapLastPosition.lat !== position.lat &&
-      mapLastPosition.lng !== position.lng
+      this.mapLastPosition.lat !== position.lat &&
+      this.mapLastPosition.lng !== position.lng
     ) {
-      setAddressInput(MSG_CONST.LOADING);
+      this.addressInput = MSG_CONST.LOADING;
+      this.addSearchBox();
 
-      getAddressFromLatLong(position).then(
+      this.getAddressFromLatLong(position).then(
         (data, status) => {
-          setAddressInput(data.formatted_address);
+          this.addressInput = data.formatted_address;
+
+          // update search box
+          this.addSearchBox();
 
           // send to parent
-          sendToParent(true, data, status);
+          this.sendToParent(true, data, status);
         },
         (error) => {
-          setAddressInput(MSG_CONST.NO_FETCH);
+          this.addressInput = MSG_CONST.NO_FETCH;
+
+          // update search box
+          this.addSearchBox();
 
           // send to parent
-          sendToParent(false, {}, error);
+          this.sendToParent(false, {}, error);
         }
       );
     }
 
     // save map last position
-    setMapLastPosition(position);
-  };
+    this.mapLastPosition = position;
+  }
 
-  /**
-   * @name getAddressFromLatLong
-   * @param {*} position
-   * @description get address from Lat Logn (reverse geocoding)
-   */
-  const getAddressFromLatLong = (position) => {
-    const geocoder = new window.google.maps.Geocoder();
+  // get address from Lat Logn (reverse geocoding)
+  getAddressFromLatLong(position) {
+    var geocoder = new window.google.maps.Geocoder();
     return new Promise((resolve, reject) => {
       geocoder.geocode({ location: position }, function (results, status) {
         if (status === "OK") {
@@ -242,23 +303,19 @@ const GMapify = (props) => {
         }
       });
     });
-  };
+  }
 
-  /**
-   * @name searchByQuery
-   * @param {String} query
-   * @description search google map address by query
-   */
-  const searchByQuery = (query) => {
+  // search google map address by query
+  searchByQuery(query) {
     return new Promise((resolve, reject) => {
       const request = {
         query,
         fields: ["name", "formatted_address", "geometry"]
       };
 
-      const service = new window.google.maps.places.PlacesService(mapInstance);
-
-      console.log("Service", service, mapInstance);
+      const service = new window.google.maps.places.PlacesService(
+        this.mapInstance
+      );
 
       service.textSearch(request, (results, status) => {
         if (status === window.google.maps.places.PlacesServiceStatus.OK) {
@@ -268,217 +325,166 @@ const GMapify = (props) => {
         }
       });
     });
-  };
+  }
 
-  /**
-   * @name searchByQueryDebounce
-   * @param {String} query
-   * @description searchByQuery with debounce time
-   */
-  let searchByQueryDebounce = (query) => {
+  // searchByQuery with debounce time
+  searchByQueryDebounce(query) {
     // minimum 3 characters required to search
     if (query && query.length < 3) {
       return;
     }
 
-    setSearchState(SEARCH_STATE.PROGRESS);
+    let { searchResults } = this.state;
+
+    this.setState({
+      searchState: SEARCH_STATE.PROGRESS
+    });
 
     // find map address by query
-    searchByQuery(query).then(
+    this.searchByQuery(query).then(
       (results) => {
-        setSearchResults(results);
-        setSearchState(SEARCH_STATE.LOAD);
+        searchResults = results;
+        this.setState({
+          searchResults,
+          searchState: SEARCH_STATE.LOAD
+        });
       },
       () => {
-        setSearchResults(searchResults);
-        setSearchState(SEARCH_STATE.FAIL);
+        this.setState({
+          searchResults: [],
+          searchState: SEARCH_STATE.FAIL
+        });
       }
     );
-  };
+  }
 
-  /**
-   * @name onChangeAddressInput
-   * @param {*} value
-   * @description input on address input box
-   */
-  const onChangeAddressInput = (value) => {
+  // input on address input box
+  onChangeAddressInput(value) {
     // find map address by query with debounce time
-    searchByQueryDebounce(value);
-  };
+    this.searchByQueryDebounce(value);
+  }
 
-  /**
-   * @name sendToParent
-   * @param {Boolean} isSuccess
-   * @param {*} mapData
-   * @param {*} mapStatus
-   * @description map data send to parent
-   */
-  const sendToParent = (isSuccess, mapData, mapStatus) => {
-    if (onSelect && typeof onSelect === "function") {
+  // show map address search input
+  showSearchInput() {
+    this.setState({
+      showMapSearch: true
+    });
+  }
+
+  // close map search
+  closeMapSerach() {
+    this.setState({
+      showMapSearch: false
+    });
+  }
+
+  // map data send to parent
+  sendToParent(isSuccess, mapData, mapStatus) {
+    if (this.props.onSelect && typeof this.props.onSelect === "function") {
       const data = JSON.parse(JSON.stringify(mapData));
-      onSelect(isSuccess, data, mapStatus);
+      this.props.onSelect(isSuccess, data, mapStatus);
     }
-  };
+  }
 
-  /**
-   * @name selectMapItem
-   * @param {*} event
-   * @description select map address item
-   */
-  const selectMapItem = (event) => {
+  // select map address item
+  selectMapItem(event) {
     const closestLiElem = event.target && event.target.closest(".mapItem");
     if (closestLiElem.hasAttribute("index")) {
-      const selectedVal =
-        searchResults[Number(closestLiElem.getAttribute("index"))];
+      const selectedVal = this.state.searchResults[
+        Number(closestLiElem.getAttribute("index"))
+      ];
 
-      setShowMapSearch(false);
+      this.setState({
+        showMapSearch: false
+      });
 
       // set marker and map position according to selected location
-      setMapPosition(
+      this.setMapPosition(
         selectedVal.geometry.location.lat(),
         selectedVal.geometry.location.lng()
       );
     }
-  };
+  }
 
-  useEffect(() => {
-    if (appKey) {
-      // call to insert google map script
-      insertMapScript();
+  // reset variables
+  componentWillUnmount() {
+    // remove events from google map
+    this.removeEvents();
+  }
 
-      // google map callback
-      window.initMapScript = () => {
-        console.log("Map script successfull");
-        mapInitSuccess();
-        searchByQueryDebounce = debounce(searchByQueryDebounce, debounceTime);
-      };
-    } else {
-      console.error("google map appKey not found!!!");
-    }
-  }, [appKey]);
+  render() {
+    const { mapClassName, markerIcon, hasMarker, hasSearch } = this.props;
+    const {
+      showMapSearch,
+      searchResults,
+      searchState,
+      isMapLoadingFailed
+    } = this.state;
 
-  useEffect(() => {
-    if (mapInstance) {
-      setMapPosition(lat, lng);
-      addEvents();
-      addSearchBox();
-    }
-  }, [mapInstance]);
-
-  useEffect(() => {
-    if (addressInput) {
-      addSearchBox();
-    }
-  }, [addressInput]);
-
-  useEffect(() => {
-    return () => {
-      removeEvents();
-    };
-  }, []);
-
-  return (
-    <div className={cx(styles.mapContainer, mapClassName)}>
-      <div ref={mapElemRef} className={styles.map}>
-        {/* map comming here */}
-      </div>
-
-      {/* map marker icon */}
-      {hasMarker && !isMapLoadingFailed && (
-        <div
-          className={styles.markerIcon}
-          style={{ backgroundImage: `url(${markerIcon})` }}
-        >
-          &nbsp;
+    return (
+      <div className={cx(styles.mapContainer, mapClassName)}>
+        <div ref={this.mapElemRef} className={styles.map}>
+          {/* map comming here */}
         </div>
-      )}
 
-      {hasSearch && !isMapLoadingFailed && !mapSearchPlace && (
-        <div ref={defaultSearchPlace} className={styles.defaultSearchPositoin}>
-          {/* Map default search place here */}
-        </div>
-      )}
-
-      {/* Render childrens */}
-      {children}
-
-      {showMapSearch && !isMapLoadingFailed && (
-        <SearchContainer
-          onClose={() => setShowMapSearch(false)}
-          onChange={onChangeAddressInput}
-          placeholder={searchPlaceHolder}
-          className={searchClassName}
-        >
-          <div className={styles.searchResultContainer}>
-            <div className={styles.searchLoading}>
-              {searchState === SEARCH_STATE.PROGRESS && "Loading..."}
-              {searchState === SEARCH_STATE.FAIL && MSG_CONST.NO_RESULT}
-            </div>
-
-            <ul
-              onClick={selectMapItem}
-              className={cx(styles.mapItemUL, "mapItem")}
-            >
-              {searchResults.map((val, index) => {
-                return (
-                  <li
-                    key={index}
-                    index={index}
-                    className={cx(styles.mapItem, "mapItem")}
-                  >
-                    <div className={styles.searchH1}>{val.name}</div>
-                    <div className={styles.searchH2}>
-                      {val.formatted_address}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+        {/* map marker icon */}
+        {hasMarker && !isMapLoadingFailed && (
+          <div
+            className={styles.markerIcon}
+            style={{ backgroundImage: `url(${markerIcon})` }}
+          >
+            &nbsp;
           </div>
-        </SearchContainer>
-      )}
-    </div>
-  );
-};
+        )}
 
-// define component prop types
-GMapify.propTypes = {
-  appKey: PropTypes.string,
-  lat: PropTypes.number,
-  lng: PropTypes.number,
-  mapOptions: PropTypes.object,
-  mapClassName: PropTypes.string,
-  hasMarker: PropTypes.bool,
-  hasSearch: PropTypes.bool,
-  mapSearchPlace: PropTypes.string,
-  debounceTime: PropTypes.number,
-  inputClassName: PropTypes.string,
-  markerIcon: PropTypes.string,
-  searchPlaceHolder: PropTypes.string,
-  searchClassName: PropTypes.string,
-  libraries: PropTypes.string,
-  onSelect: PropTypes.func,
-  children: PropTypes.element
-};
+        {hasSearch && !isMapLoadingFailed && !this.props.mapSearchPlace && (
+          <div
+            ref={this.defaultSearchPlace}
+            className={styles.defaultSearchPositoin}
+          >
+            {/* Map default search place here */}
+          </div>
+        )}
 
-// define default values of prop types
-GMapify.defaultProps = {
-  appKey: "",
-  lat: DEFAULT_LAT_LONG.lat,
-  lng: DEFAULT_LAT_LONG.lng,
-  mapOptions: {},
-  mapClassName: "",
-  hasMarker: DEFAULT_HAS_MARKER,
-  hasSearch: DEFAULT_HAS_SEARCH,
-  mapSearchPlace: "",
-  debounceTime: DEFAULT_DEBOUNCE_TIME, // time in ms
-  inputClassName: "",
-  markerIcon: DEFAULT_MARKER_ICON,
-  searchPlaceHolder: DEFAULT_SEARCH_PLACEHOLDER,
-  searchClassName: "",
-  libraries: DEFAULT_LIBRARY_MODE,
-  onSelect: () => {},
-  children: null
-};
+        {/* Render childrens */}
+        {this.props.children}
 
-export default GMapify;
+        {showMapSearch && !isMapLoadingFailed && (
+          <SearchContainer
+            onClose={this.closeMapSerach}
+            onChange={this.onChangeAddressInput}
+            placeholder={this.props.searchPlaceHolder}
+            className={this.props.searchClassName}
+          >
+            <div className={styles.searchResultContainer}>
+              <div className={styles.searchLoading}>
+                {searchState === SEARCH_STATE.PROGRESS && "Loading..."}
+                {searchState === SEARCH_STATE.FAIL && MSG_CONST.NO_RESULT}
+              </div>
+
+              <ul
+                onClick={this.selectMapItem}
+                className={cx(styles.mapItemUL, "mapItem")}
+              >
+                {searchResults.map((val, index) => {
+                  return (
+                    <li
+                      key={index}
+                      index={index}
+                      className={cx(styles.mapItem, "mapItem")}
+                    >
+                      <div className={styles.searchH1}>{val.name}</div>
+                      <div className={styles.searchH2}>
+                        {val.formatted_address}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </SearchContainer>
+        )}
+      </div>
+    );
+  }
+}

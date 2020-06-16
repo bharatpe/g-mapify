@@ -1,8 +1,7 @@
-import React, { useCallback, useState, useRef } from 'react'
+import React, { useCallback, useState } from 'react'
 
 import { GMapify, AddressFormatter } from 'g-mapify'
 import 'g-mapify/dist/index.css'
-// import InputDefault from './components/Input';
 
 const App = () => {
   const mapOptions = {
@@ -10,16 +9,14 @@ const App = () => {
   };
 
   const [showSearchMap, setShowSearchMap] = useState(false);
-  const [inputVal, setInputval] = useState('');
-  const refs = useRef(null);
 
-  const onMapSelect = useCallback((status, data) => {
+  const onMapSelect = (status, data) => {
     console.warn('Map Data', data);
 
     // get formatted address from google map address_components
     const formattedAddress = AddressFormatter(data.address_components);
     console.warn('formated address', formattedAddress);
-  }, []);
+  };
 
   const onMapButtonClicked = useCallback(() => {
     setShowSearchMap(() => {
