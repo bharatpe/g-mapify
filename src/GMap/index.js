@@ -1,16 +1,22 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import styles from "./style.css";
 import cx from "classnames";
 import PropTypes from "prop-types";
 import SearchContainer from "../SearchContainer";
-import debounce from "../helper_/debounce";
-
-// default set Delhi lat long
-const DEFAULT_LAT_LONG = {
-  lat: 28.7041,
-  lng: 77.1025
-};
+import debounce from "../utils/debounce";
+import {
+  SEARCH_STATE,
+  MSG_CONST,
+  DEFAULT_LAT_LONG,
+  DEFAULT_MAP_OPTIONS,
+  DEFAULT_DEBOUNCE_TIME,
+  DEFAULT_HAS_MARKER,
+  DEFAULT_HAS_SEARCH,
+  DEFAULT_SEARCH_PLACEHOLDER,
+  DEFAULT_LIBRARY_MODE,
+  DEFAULT_MARKER_ICON
+} from "../constants";
 
 const SearchInputComponent = (props) => {
   return (
@@ -22,287 +28,212 @@ const SearchInputComponent = (props) => {
   );
 };
 
-// Map search API loading state
-const SEARCH_STATE = {
-  LOAD: 1,
-  FAIL: -1,
-  PROGRESS: 0
-};
+const GMap = (props) => {
+  const {
+    appKey,
+    lat,
+    lng,
+    mapOptions,
+    mapClassName,
+    hasMarker,
+    hasSearch,
+    mapSearchPlace,
+    debounceTime,
+    inputClassName,
+    markerIcon,
+    searchPlaceHolder,
+    searchClassName,
+    libraries,
+    children,
+    onSelect
+  } = props;
 
-// Map message constant
-const MSG_CONST = {
-  NO_FETCH: "Unable to fetch location",
-  NO_RESULT: "No Results Found",
-  LOADING: "Loading...",
-  MAP_NOT_LOADED: "Map load failed!"
-};
-
-export default class GMap extends React.PureComponent {
-  // google Map default options
-  static defaultMapOptions = {
-    zoom: 15,
-    zoomControl: false,
-    mapTypeControl: false,
-    fullscreenControl: false,
-    streetViewControl: false,
-    clickableIcons: false,
-    mapTypeId: "roadmap" // ["hybrid, roadmap, satellite, terrain"]
-  };
-
-  // define component prop types
-  static propTypes = {
-    appKey: PropTypes.string,
-    lat: PropTypes.number,
-    lng: PropTypes.number,
-    mapOptions: PropTypes.object,
-    mapClassName: PropTypes.string,
-    hasMarker: PropTypes.bool,
-    hasSearch: PropTypes.bool,
-    mapSearchPlace: PropTypes.string,
-    debounceTime: PropTypes.number,
-    inputClassName: PropTypes.string,
-    markerIcon: PropTypes.string,
-    searchPlaceHolder: PropTypes.string,
-    searchClassName: PropTypes.string,
-    libraries: PropTypes.string,
-    onSelect: PropTypes.func
-  };
-
-  // define default values of prop types
-  static defaultProps = {
-    appKey: "",
-    lat: DEFAULT_LAT_LONG.lat,
-    lng: DEFAULT_LAT_LONG.lng,
-    mapOptions: {},
-    mapClassName: "",
-    hasMarker: true,
-    hasSearch: false,
-    mapSearchPlace: "",
-    debounceTime: 2000, // time in ms
-    inputClassName: "",
-    markerIcon:
-      "https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png",
-    searchPlaceHolder: "Search here",
-    searchClassName: "",
-    libraries: "places",
-    onSelect: () => {}
-  };
-
-  // store google map instance
-  mapInstance = null;
+  const [searchResults, setSearchResults] = useState([]);
+  const [showMapSearch, setShowMapSearch] = useState(false);
+  const [searchState, setSearchState] = useState(SEARCH_STATE.LOAD);
+  const [isMapLoadingFailed, setIsMapLoadingFailed] = useState(false);
+  const [mapLastPosition, setMapLastPosition] = useState({});
+  const [addressInput, setAddressInput] = useState("");
+  const [mapInstance, setMapInstance] = useState(null);
 
   // store google map render element instance
-  mapElemRef = null;
+  const mapElemRef = useRef(null);
+  let defaultSearchPlace = useRef(null);
 
-  // store map default search place element instance
-  defaultSearchPlace = null;
-
-  // store map last position
-  mapLastPosition = {};
-
-  // store map formatted address
-  addressInput = "";
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      searchResults: [],
-      showMapSearch: false,
-      searchState: SEARCH_STATE.LOAD,
-      isMapLoadingFailed: false
-    };
-
-    this.mapElemRef = React.createRef();
-    this.defaultSearchPlace = React.createRef();
-
-    this.onChangeAddressInput = this.onChangeAddressInput.bind(this);
-
-    // implement debounce time when user search location
-    this.searchByQueryDebounce = debounce(
-      this.searchByQueryDebounce,
-      this.props.debounceTime
-    );
-    this.showSearchInput = this.showSearchInput.bind(this);
-    this.closeMapSerach = this.closeMapSerach.bind(this);
-    this.selectMapItem = this.selectMapItem.bind(this);
-  }
-
-  componentDidMount() {
-    if (this.props.appKey) {
-      // call to insert google map script
-      this.insertMapScript();
-
-      // google map callback
-      window.initMapScript = (event) => {
-        this.mapInitSuccess();
-      };
-    } else {
-      console.error("google map appKey not found!!!");
+  /**
+   * @name mapInitSuccess
+   * @description google map script file added successfully
+   */
+  const mapInitSuccess = () => {
+    if (mapSearchPlace) {
+      defaultSearchPlace = { current: document.querySelector(mapSearchPlace) };
     }
-  }
+    createMapInstance(lat, lng);
+  };
 
-  // add google map script file to project
-  insertMapScript() {
+  /**
+   * @name insertMapScript
+   * @description add google map script file to project
+   */
+  const insertMapScript = () => {
     const isGMapScriptAdded = document.head.querySelector("#google-map");
 
     if (!isGMapScriptAdded) {
       // error occured in Google Map loading
       window.gm_authFailure = () => {
-        this.setState({
-          isMapLoadingFailed: true
-        });
-
-        this.sendToParent(false, { message: MSG_CONST.MAP_NOT_LOADED }, -1);
+        setIsMapLoadingFailed(true);
+        sendToParent(false, { message: MSG_CONST.MAP_NOT_LOADED }, -1);
       };
 
       const scriptElem = document.createElement("script");
-      const librariesOptions = this.props.libraries;
-      scriptElem.src = `https://maps.googleapis.com/maps/api/js?key=${this.props.appKey}&callback=initMapScript&libraries=${librariesOptions}`;
+      scriptElem.src = `https://maps.googleapis.com/maps/api/js?key=${appKey}&callback=initMapScript&libraries=${libraries}`;
       scriptElem.setAttribute("id", "google-map");
       document.querySelector("head").appendChild(scriptElem);
     } else {
       // skip to add google map script when already added
-      this.mapInitSuccess();
+      mapInitSuccess();
     }
-  }
+  };
 
-  // google map script file added successfully
-  mapInitSuccess() {
-    const mapSearchPlaceElem = this.props.mapSearchPlace;
-    if (mapSearchPlaceElem) {
-      this.defaultSearchPlace = {
-        current: document.querySelector(mapSearchPlaceElem)
-      };
-    }
-    this.createMapInstance(this.props.lat, this.props.lng);
-  }
-
-  // create map instance
-  createMapInstance(lat, lng) {
+  /**
+   * @name createMapInstance
+   * @param {Float} lat
+   * @param {Float} lng
+   * @description create map instance
+   */
+  const createMapInstance = (lat, lng) => {
     if (!window.google) {
       console.error("google map library not found!");
       return;
     }
 
-    const { props } = this;
-    const latLng = new window.google.maps.LatLng(lat, lng);
     const center = {
-      center: latLng
+      center: new window.google.maps.LatLng(lat, lng)
     };
 
     // create google map instance
-    if (this.mapElemRef.current) {
-      this.mapInstance = new window.google.maps.Map(this.mapElemRef.current, {
-        ...center,
-        ...GMap.defaultMapOptions,
-        ...props.mapOptions
-      });
+    console.log("MAP INSTANXE", mapElemRef.current);
 
-      // add marker icon
-      if (props.hasMarker) {
-        this.addEvents();
-      }
-
-      // set map postion to according to porps lat/lng
-      this.setMapPosition(this.props.lat, this.props.lng);
-
-      // add marker icon
-      if (props.hasSearch) {
-        this.addSearchBox();
-      }
+    if (mapElemRef.current) {
+      setMapInstance(
+        new window.google.maps.Map(mapElemRef.current, {
+          ...center,
+          ...DEFAULT_MAP_OPTIONS,
+          ...mapOptions
+        })
+      );
     }
-  }
+  };
 
-  // add search box to map
-  addSearchBox() {
-    if (this.props.hasSearch) {
-      if (this.defaultSearchPlace.current) {
+  /**
+   * @name addSearchBox
+   * @description add search box to map
+   */
+  const addSearchBox = () => {
+    if (hasSearch) {
+      if (defaultSearchPlace.current) {
         ReactDOM.render(
           <SearchInputComponent
-            value={this.addressInput}
-            onFocus={this.showSearchInput}
-            className={this.props.inputClassName}
+            value={addressInput}
+            onFocus={() => setShowMapSearch(true)}
+            className={inputClassName}
           />,
-          this.defaultSearchPlace.current
+          defaultSearchPlace.current
         );
       } else {
-        console.error('mapSearchPlace element not found!', "Selector = ", this.props.mapSearchPlace);
+        console.error(
+          "mapSearchPlace element not found!",
+          "Selector = ",
+          mapSearchPlace
+        );
       }
     }
-  }
+  };
 
-  // add events to google map
-  addEvents() {
-    if (this.mapInstance) {
+  /**
+   * @name addEvents
+   * @description add events to google map
+   */
+  const addEvents = () => {
+    if (mapInstance && hasMarker) {
       // bind dragend event for fetch map center lat long
-      this.mapInstance.addListener("dragend", () => {
-        this.setMapPosition(
-          this.mapInstance.center.lat(),
-          this.mapInstance.center.lng()
-        );
+      mapInstance.addListener("dragend", () => {
+        setMapPosition(mapInstance.center.lat(), mapInstance.center.lng());
       });
 
       // bind zoom change event because always need to zoom from center
-      this.mapInstance.addListener("zoom_changed", () => {
-        this.setMapPosition(this.mapLastPosition.lat, this.mapLastPosition.lng);
+      mapInstance.addListener("zoom_changed", () => {
+        setMapPosition(mapLastPosition.lat, mapLastPosition.lng);
       });
     }
-  }
+  };
 
-  // remove events from google map
-  removeEvents() {
-    if (window.google) {
-      window.google.maps.event.clearListeners(this.mapInstance, "dragend");
-      window.google.maps.event.clearListeners(this.mapInstance, "zoom_changed");
+  /**
+   * @name removeEvents
+   * @description remove events from google map
+   */
+  const removeEvents = () => {
+    if (window.google && mapInstance) {
+      window.google.maps.event.clearListeners(mapInstance, "dragend");
+      window.google.maps.event.clearListeners(mapInstance, "zoom_changed");
     }
-  }
+  };
 
-  // set google map position
-  setMapPosition(lat, lng) {
+  /**
+   * @name setMapPosition
+   * @param {Float} lat
+   * @param {Float} lng
+   * @description set google map position
+   */
+  const setMapPosition = (lat, lng) => {
     const position = {
       lat: lat,
       lng: lng
     };
 
-    this.mapInstance.setCenter(position);
-    this.mapInstance.panTo(position);
+    mapInstance.setCenter(position);
+    mapInstance.panTo(position);
 
     // get address only when previous and current lat/lng different
     if (
-      this.mapLastPosition.lat !== position.lat &&
-      this.mapLastPosition.lng !== position.lng
+      mapLastPosition.lat !== position.lat &&
+      mapLastPosition.lng !== position.lng
     ) {
-      this.addressInput = MSG_CONST.LOADING;
-      this.addSearchBox();
+      setAddressInput(MSG_CONST.LOADING);
+      addSearchBox();
 
-      this.getAddressFromLatLong(position).then(
+      getAddressFromLatLong(position).then(
         (data, status) => {
-          this.addressInput = data.formatted_address;
+          setAddressInput(data.formatted_address);
 
           // update search box
-          this.addSearchBox();
+          addSearchBox();
 
           // send to parent
-          this.sendToParent(true, data, status);
-        }, (error) => {
-          this.addressInput = MSG_CONST.NO_FETCH;
+          sendToParent(true, data, status);
+        },
+        (error) => {
+          setAddressInput(MSG_CONST.NO_FETCH);
 
           // update search box
-          this.addSearchBox();
+          addSearchBox();
 
           // send to parent
-          this.sendToParent(false, {}, error);
+          sendToParent(false, {}, error);
         }
       );
     }
 
     // save map last position
-    this.mapLastPosition = position;
-  }
+    setMapLastPosition(position);
+  };
 
-  // get address from Lat Logn (reverse geocoding)
-  getAddressFromLatLong(position) {
+  /**
+   * @name getAddressFromLatLong
+   * @param {*} position
+   * @description get address from Lat Logn (reverse geocoding)
+   */
+  const getAddressFromLatLong = (position) => {
     var geocoder = new window.google.maps.Geocoder();
     return new Promise((resolve, reject) => {
       geocoder.geocode({ location: position }, function (results, status) {
@@ -318,19 +249,23 @@ export default class GMap extends React.PureComponent {
         }
       });
     });
-  }
+  };
 
-  // search google map address by query
-  searchByQuery(query) {
+  /**
+   * @name searchByQuery
+   * @param {String} query
+   * @description search google map address by query
+   */
+  const searchByQuery = (query) => {
     return new Promise((resolve, reject) => {
       const request = {
         query,
-        fields: ["name", "formatted_address", "geometry"],
+        fields: ["name", "formatted_address", "geometry"]
       };
 
-      const service = new window.google.maps.places.PlacesService(
-        this.mapInstance
-      );
+      const service = new window.google.maps.places.PlacesService(mapInstance);
+
+      console.log("Service", service, mapInstance);
 
       service.textSearch(request, (results, status) => {
         if (status === window.google.maps.places.PlacesServiceStatus.OK) {
@@ -340,166 +275,215 @@ export default class GMap extends React.PureComponent {
         }
       });
     });
-  }
+  };
 
-  // searchByQuery with debounce time
-  searchByQueryDebounce(query) {
+  /**
+   * @name searchByQueryDebounce
+   * @param {String} query
+   * @description searchByQuery with debounce time
+   */
+  let searchByQueryDebounce = (query) => {
     // minimum 3 characters required to search
     if (query && query.length < 3) {
       return;
     }
 
-    let { searchResults } = this.state;
-
-    this.setState({
-      searchState: SEARCH_STATE.PROGRESS
-    });
+    setSearchState(SEARCH_STATE.PROGRESS);
 
     // find map address by query
-    this.searchByQuery(query).then(
+    searchByQuery(query).then(
       (results) => {
-        searchResults = results;
-        this.setState({
-          searchResults,
-          searchState: SEARCH_STATE.LOAD
-        });
+        setSearchResults(results);
+        setSearchState(SEARCH_STATE.LOAD);
       },
       () => {
-        this.setState({
-          searchResults: [],
-          searchState: SEARCH_STATE.FAIL
-        });
+        setSearchResults(searchResults);
+        setSearchState(SEARCH_STATE.FAIL);
       }
     );
-  }
+  };
 
-  // input on address input box
-  onChangeAddressInput(value) {
+  /**
+   * @name onChangeAddressInput
+   * @param {*} value
+   * @description input on address input box
+   */
+  const onChangeAddressInput = (value) => {
     // find map address by query with debounce time
-    this.searchByQueryDebounce(value);
-  }
+    searchByQueryDebounce(value);
+  };
 
-  // show map address search input
-  showSearchInput() {
-    this.setState({
-      showMapSearch: true
-    });
-  }
-
-  // close map search
-  closeMapSerach() {
-    this.setState({
-      showMapSearch: false
-    });
-  }
-
-  // map data send to parent
-  sendToParent(isSuccess, mapData, mapStatus) {
-    if (this.props.onSelect && typeof this.props.onSelect === "function") {
+  /**
+   * @name sendToParent
+   * @param {Boolean} isSuccess
+   * @param {*} mapData
+   * @param {*} mapStatus
+   * @description map data send to parent
+   */
+  const sendToParent = (isSuccess, mapData, mapStatus) => {
+    if (onSelect && typeof onSelect === "function") {
       const data = JSON.parse(JSON.stringify(mapData));
-      this.props.onSelect(isSuccess, data, mapStatus);
+      onSelect(isSuccess, data, mapStatus);
     }
-  }
+  };
 
-  // select map address item
-  selectMapItem(event) {
+  /**
+   * @name selectMapItem
+   * @param {*} event
+   * @description select map address item
+   */
+  const selectMapItem = (event) => {
     const closestLiElem = event.target && event.target.closest(".mapItem");
     if (closestLiElem.hasAttribute("index")) {
-      const selectedVal = this.state.searchResults[
-        Number(closestLiElem.getAttribute("index"))
-      ];
+      const selectedVal =
+        searchResults[Number(closestLiElem.getAttribute("index"))];
 
-      this.setState({
-        showMapSearch: false
-      });
+      setShowMapSearch(false);
 
       // set marker and map position according to selected location
-      this.setMapPosition(
+      setMapPosition(
         selectedVal.geometry.location.lat(),
         selectedVal.geometry.location.lng()
       );
     }
-  }
+  };
 
-  // reset variables
-  componentWillUnmount() {
-    // remove events from google map
-    this.removeEvents();
-  }
+  useEffect(() => {
+    if (appKey) {
+      // call to insert google map script
+      insertMapScript();
 
-  render() {
-    const { mapClassName, markerIcon, hasMarker, hasSearch } = this.props;
-    const {
-      showMapSearch,
-      searchResults,
-      searchState,
-      isMapLoadingFailed
-    } = this.state;
+      // google map callback
+      window.initMapScript = () => {
+        console.log("Map script successfull");
+        mapInitSuccess();
+        searchByQueryDebounce = debounce(searchByQueryDebounce, debounceTime);
+      };
 
-    return (
-      <div className={cx(styles.mapContainer, mapClassName)}>
-        <div ref={this.mapElemRef} className={styles.map}>
-          {/* map comming here */}
-        </div>
+      // Adding debounce to search query
 
-        {/* map marker icon */}
-        {hasMarker && !isMapLoadingFailed && (
-          <div
-            className={styles.markerIcon}
-            style={{ backgroundImage: `url(${markerIcon})` }}
-          >
-            &nbsp;
-          </div>
-        )}
+      // searchByQueryDebounce = debounce(searchByQueryDebounce, debounceTime);
+    } else {
+      console.error("google map appKey not found!!!");
+    }
+  }, [appKey]);
 
-        {hasSearch && !isMapLoadingFailed && !this.props.mapSearchPlace && (
-          <div
-            ref={this.defaultSearchPlace}
-            className={styles.defaultSearchPositoin}
-          >
-            {/* Map default search place here */}
-          </div>
-        )}
+  useEffect(() => {
+    if (mapInstance) {
+      setMapPosition(lat, lng);
+      addEvents();
+      addSearchBox();
+    }
+  }, [mapInstance]);
 
-        {/* Render childrens */}
-        {this.props.children}
+  useEffect(() => {
+    return () => {
+      removeEvents();
+    };
+  }, []);
 
-        {showMapSearch && !isMapLoadingFailed && (
-          <SearchContainer
-            onClose={this.closeMapSerach}
-            onChange={this.onChangeAddressInput}
-            placeholder={this.props.searchPlaceHolder}
-            className={this.props.searchClassName}
-          >
-            <div className={styles.searchResultContainer}>
-              <div className={styles.searchLoading}>
-                {searchState === SEARCH_STATE.PROGRESS && "Loading..."}
-                {searchState === SEARCH_STATE.FAIL && MSG_CONST.NO_RESULT}
-              </div>
-
-              <ul
-                onClick={this.selectMapItem}
-                className={cx(styles.mapItemUL, "mapItem")}
-              >
-                {searchResults.map((val, index) => {
-                  return (
-                    <li
-                      key={index}
-                      index={index}
-                      className={cx(styles.mapItem, "mapItem")}
-                    >
-                      <div className={styles.searchH1}>{val.name}</div>
-                      <div className={styles.searchH2}>
-                        {val.formatted_address}
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          </SearchContainer>
-        )}
+  return (
+    <div className={cx(styles.mapContainer, mapClassName)}>
+      <div ref={mapElemRef} className={styles.map}>
+        {/* map comming here */}
       </div>
-    );
-  }
-}
+
+      {/* map marker icon */}
+      {hasMarker && !isMapLoadingFailed && (
+        <div
+          className={styles.markerIcon}
+          style={{ backgroundImage: `url(${markerIcon})` }}
+        >
+          &nbsp;
+        </div>
+      )}
+
+      {hasSearch && !isMapLoadingFailed && !mapSearchPlace && (
+        <div ref={defaultSearchPlace} className={styles.defaultSearchPositoin}>
+          {/* Map default search place here */}
+        </div>
+      )}
+
+      {/* Render childrens */}
+      {children}
+
+      {showMapSearch && !isMapLoadingFailed && (
+        <SearchContainer
+          onClose={() => setShowMapSearch(false)}
+          onChange={onChangeAddressInput}
+          placeholder={searchPlaceHolder}
+          className={searchClassName}
+        >
+          <div className={styles.searchResultContainer}>
+            <div className={styles.searchLoading}>
+              {searchState === SEARCH_STATE.PROGRESS && "Loading..."}
+              {searchState === SEARCH_STATE.FAIL && MSG_CONST.NO_RESULT}
+            </div>
+
+            <ul
+              onClick={selectMapItem}
+              className={cx(styles.mapItemUL, "mapItem")}
+            >
+              {searchResults.map((val, index) => {
+                return (
+                  <li
+                    key={index}
+                    index={index}
+                    className={cx(styles.mapItem, "mapItem")}
+                  >
+                    <div className={styles.searchH1}>{val.name}</div>
+                    <div className={styles.searchH2}>
+                      {val.formatted_address}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </SearchContainer>
+      )}
+    </div>
+  );
+};
+
+// define component prop types
+GMap.propTypes = {
+  appKey: PropTypes.string,
+  lat: PropTypes.number,
+  lng: PropTypes.number,
+  mapOptions: PropTypes.object,
+  mapClassName: PropTypes.string,
+  hasMarker: PropTypes.bool,
+  hasSearch: PropTypes.bool,
+  mapSearchPlace: PropTypes.string,
+  debounceTime: PropTypes.number,
+  inputClassName: PropTypes.string,
+  markerIcon: PropTypes.string,
+  searchPlaceHolder: PropTypes.string,
+  searchClassName: PropTypes.string,
+  libraries: PropTypes.string,
+  onSelect: PropTypes.func,
+  children: PropTypes.element
+};
+
+// define default values of prop types
+GMap.defaultProps = {
+  appKey: "",
+  lat: DEFAULT_LAT_LONG.lat,
+  lng: DEFAULT_LAT_LONG.lng,
+  mapOptions: {},
+  mapClassName: "",
+  hasMarker: DEFAULT_HAS_MARKER,
+  hasSearch: DEFAULT_HAS_SEARCH,
+  mapSearchPlace: "",
+  debounceTime: DEFAULT_DEBOUNCE_TIME, // time in ms
+  inputClassName: "",
+  markerIcon: DEFAULT_MARKER_ICON,
+  searchPlaceHolder: DEFAULT_SEARCH_PLACEHOLDER,
+  searchClassName: "",
+  libraries: DEFAULT_LIBRARY_MODE,
+  onSelect: () => {},
+  children: null
+};
+
+export default GMap;
