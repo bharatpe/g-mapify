@@ -23,7 +23,7 @@ Basic use:
 	    )
     }
 ### Example: Basic map
- ![basic map image](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/basic-map.jpg?token=AOWSXMVLCYIAKCY2FC62BJS66D47O)
+ ![basic map image](https://github.com/bharatpe/react-g-map/blob/master/example/images/basic-map.jpg?raw=true)
 ## Options
 |  Props | Description  | Default value
 |--|--|--|
@@ -61,9 +61,9 @@ Basic use:
     }
  Note: If *status* is getting *false* that means something happened bad on location search.
 ### See below pictures
-![map search image](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/map-search2.jpg?token=AOWSXMW35JZIB46KBJUZD3K66DZRI)
+![Map Search image](https://github.com/bharatpe/react-g-map/blob/master/example/images/map-search2.jpg?raw=true)
   
-  ![map search container](https://raw.githubusercontent.com/bharatpe/g-map/master/example/images/map-search1.jpg?token=AOWSXMRR2GFIWJR625KQHFS66DZUK)
+  ![Map Search container](https://github.com/bharatpe/react-g-map/blob/master/example/images/map-search1.jpg?raw=true)
 ## Address Formatter
 You can get City, Pincode, State etc. from *address_components* using **addressFormatter** method. This method transfrom *address_components* array data into *object*.
 
