@@ -110,4 +110,4 @@ Here [Contributors](https://github.com/bharatpe/g-mapify/graphs/contributors)
 
 
 ## License
-ISC | BharatPe © [BharatPe TM](https://github.com/BharatPe TM)
+ISC [BharatPe TM](https://github.com/BharatPe)
