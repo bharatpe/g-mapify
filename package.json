@@ -3,7 +3,7 @@
   "version": "0.0.3",
   "description": "google map for React projects",
   "author": "BharatPe TM",
-  "license": "BharatPe",
+  "license": "ISC",
   "repository": "https://github.com/bharatpe/g-mapify",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",

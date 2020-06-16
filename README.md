@@ -7,10 +7,12 @@ Flexible react google map, Which more options for search, pick & select.
 Add it to package.json as a dependency
 
     General
-    "g-mapify": "git+ssh://git@github.com/bharatpe/g-mapify.git"
+    yarn add g-mapify
     
-    With Authtoken
-    "g-mapify": "git+https://[AUTH_TOKEN]:x-oauth-basic@github.com/bharatpe/g-mapify.git"
+    or 
+
+    npm i g-mapify
+    
 
 
 ## Usage
@@ -93,4 +95,4 @@ This repo build with [create-react-library](https://github.com/transitive-bullsh
 
 
 ## License
-BharatPe © [BharatPe TM](https://github.com/BharatPe TM)
+ISC | BharatPe © [BharatPe TM](https://github.com/BharatPe TM)

@@ -4788,8 +4788,10 @@ functional-red-black-tree@^1.0.1:
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
 
-"g-mapify@file:..":
-  version "1.0.0"
+g-mapify@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/g-mapify/-/g-mapify-0.0.3.tgz#82054684e173429dd3564039826b8e406e96ee5a"
+  integrity sha512-KJXpY+kxdozwZnoXI06nP05dRLzUyq8U3cwfTBJTTMAgdiGr6JS6tXOHnomRhXsndY+P5L29sj616h+0yoP7Rg==
 
 gensync@^1.0.0-beta.1:
   version "1.0.0-beta.1"
