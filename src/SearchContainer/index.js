@@ -1,93 +1,79 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./style.css";
 import cx from "classnames";
 import backArrow from "../assets/left-arrow.svg";
 import PropTypes from "prop-types";
 
-export default class SearchContainer extends React.PureComponent {
-  // define default props
-  static propTypes = {
-    placeHolder: PropTypes.string,
-    onChange: PropTypes.func,
-    onClose: PropTypes.func
+/**
+ * @name SearchContainer
+ * @param {@} props
+ * @description Address search container for GMap
+ */
+const SearchContainer = (props) => {
+  const { placeholder, className } = props;
+  const [showSearch, setShowSearch] = useState(true);
+  const inputRef = React.createRef();
+
+  useEffect(() => {
+    inputRef.current.focus();
+  }, [inputRef]);
+
+  /**
+   * @name onSearchChange
+   * @param {*} event
+   * @description On search input change
+   */
+  const onSearchChange = (event) => {
+    console.log("Searching ...", event?.target?.value);
+    props.onChange(event?.target?.value);
   };
 
-  static defaultProps = {
-    placeHolder: "Search here",
-    onChange: () => {},
-    onClose: () => {}
+  /**
+   * @name onTransitionEndEvent
+   * @param {*} event
+   * @description On animation end
+   */
+  const onTransitionEndEvent = (event) => {
+    console.log("onTransitionEndEvent -> event", event);
+    props.onClose();
   };
 
-  inputRef = null;
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      closed: true,
-      showSearch: true
-    };
-
-    this.inputRef = React.createRef();
-
-    this.onSearchChange = this.onSearchChange.bind(this);
-    this.onTransitionEndEvent = this.onTransitionEndEvent.bind(this);
-  }
-
-  componentDidMount() {
-    setTimeout(() => {
-      this.inputRef.current.focus();
-    }, 100);
-  }
-
-  // close search container
-  closeSearch() {
-    this.setState({
-      showSearch: false
-    });
-  }
-
-  // on search input change
-  onSearchChange(event) {
-    const searchVal = event.target.value;
-
-    // call props onChange
-    this.props.onChange(searchVal);
-  }
-
-  // animation end event
-  onTransitionEndEvent(event) {
-    this.props.onClose();
-  }
-
-  render() {
-    const { showSearch } = this.state;
-    const { placeholder, className } = this.props;
-
-    return (
-      <div
-        className={cx(
-          styles.mapSearchContainer,
-          className,
-          !showSearch ? styles.hide : styles.show
-        )}
-        onTransitionEnd={this.onTransitionEndEvent}
-      >
-        <div className={styles.searchHeader}>
-          <div className="img-sec" onClick={() => this.closeSearch()}>
-            <img src={backArrow} />
-          </div>
-          <input
-            type="text"
-            className={styles.searchTextbox}
-            onChange={this.onSearchChange}
-            ref={this.inputRef}
-            placeholder={placeholder}
-          />
+  return (
+    <div
+      className={cx(
+        styles.mapSearchContainer,
+        className,
+        !showSearch ? styles.hide : styles.show
+      )}
+      onTransitionEnd={onTransitionEndEvent}
+    >
+      <div className={styles.searchHeader}>
+        <div className="img-sec" onClick={() => setShowSearch(false)}>
+          <img src={backArrow} />
         </div>
-
-        {this.props.children}
+        <input
+          type="text"
+          className={styles.searchTextbox}
+          onChange={onSearchChange}
+          ref={inputRef}
+          placeholder={placeholder}
+        />
       </div>
-    );
-  }
-}
+      {props.children}
+    </div>
+  );
+};
+
+SearchContainer.propTypes = {
+  placeHolder: PropTypes.string,
+  onChange: PropTypes.func,
+  onClose: PropTypes.func
+};
+
+SearchContainer.defaultProps = {
+  placeHolder: "Search here",
+  onChange: () => {},
+  onClose: () => {}
+};
+
+export default SearchContainer;
