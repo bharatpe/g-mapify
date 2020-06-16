@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useRef } from 'react'
 
-import { GMap, addressFormatter } from 'g-map'
-import 'g-map/dist/index.css'
+import { GMap, addressFormatter } from 'g-mapify'
+import 'g-mapify/dist/index.css'
 // import InputDefault from './components/Input';
 
 const App = () => {

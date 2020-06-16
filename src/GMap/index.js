@@ -200,23 +200,16 @@ const GMap = (props) => {
       mapLastPosition.lng !== position.lng
     ) {
       setAddressInput(MSG_CONST.LOADING);
-      addSearchBox();
 
       getAddressFromLatLong(position).then(
         (data, status) => {
           setAddressInput(data.formatted_address);
-
-          // update search box
-          addSearchBox();
 
           // send to parent
           sendToParent(true, data, status);
         },
         (error) => {
           setAddressInput(MSG_CONST.NO_FETCH);
-
-          // update search box
-          addSearchBox();
 
           // send to parent
           sendToParent(false, {}, error);
@@ -234,7 +227,7 @@ const GMap = (props) => {
    * @description get address from Lat Logn (reverse geocoding)
    */
   const getAddressFromLatLong = (position) => {
-    var geocoder = new window.google.maps.Geocoder();
+    const geocoder = new window.google.maps.Geocoder();
     return new Promise((resolve, reject) => {
       geocoder.geocode({ location: position }, function (results, status) {
         if (status === "OK") {
@@ -359,10 +352,6 @@ const GMap = (props) => {
         mapInitSuccess();
         searchByQueryDebounce = debounce(searchByQueryDebounce, debounceTime);
       };
-
-      // Adding debounce to search query
-
-      // searchByQueryDebounce = debounce(searchByQueryDebounce, debounceTime);
     } else {
       console.error("google map appKey not found!!!");
     }
@@ -375,6 +364,12 @@ const GMap = (props) => {
       addSearchBox();
     }
   }, [mapInstance]);
+
+  useEffect(() => {
+    if (addressInput) {
+      addSearchBox();
+    }
+  }, [addressInput]);
 
   useEffect(() => {
     return () => {

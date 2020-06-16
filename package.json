@@ -1,10 +1,10 @@
 {
-  "name": "g-map",
+  "name": "g-mapify",
   "version": "1.0.0",
   "description": "google map for React projects",
   "author": "BharatPe TM",
   "license": "BharatPe",
-  "repository": "BharatPe TM/g-map",
+  "repository": "https://github.com/bharatpe/g-mapify",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
   "source": "src/index.js",
