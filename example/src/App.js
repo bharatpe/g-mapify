@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useRef } from 'react'
 
-import { GMap, addressFormatter } from 'g-map'
-import 'g-map/dist/index.css'
+import { GMapify, addressFormatter } from 'g-mapify'
+import 'g-mapify/dist/index.css'
 // import InputDefault from './components/Input';
 
 const App = () => {
@@ -36,12 +36,12 @@ const App = () => {
       !showSearchMap ?
       (
         // Basic example
-        <GMap key={1} mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-100" />
+        <GMapify key={1} mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-100" />
       )
       :
       (
         // example with additional options
-        <GMap key={2} mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-100" hasSearch onSelect={onMapSelect} />
+        <GMapify key={2} mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-100" hasSearch onSelect={onMapSelect} />
       )
     }
 

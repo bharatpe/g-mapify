@@ -28,7 +28,7 @@ const SearchInputComponent = (props) => {
   );
 };
 
-const GMap = (props) => {
+const GMapify = (props) => {
   const {
     appKey,
     lat,
@@ -76,9 +76,9 @@ const GMap = (props) => {
    * @description add google map script file to project
    */
   const insertMapScript = () => {
-    const isGMapScriptAdded = document.head.querySelector("#google-map");
+    const isGMapifyScriptAdded = document.head.querySelector("#google-map");
 
-    if (!isGMapScriptAdded) {
+    if (!isGMapifyScriptAdded) {
       // error occured in Google Map loading
       window.gm_authFailure = () => {
         setIsMapLoadingFailed(true);
@@ -200,23 +200,16 @@ const GMap = (props) => {
       mapLastPosition.lng !== position.lng
     ) {
       setAddressInput(MSG_CONST.LOADING);
-      addSearchBox();
 
       getAddressFromLatLong(position).then(
         (data, status) => {
           setAddressInput(data.formatted_address);
-
-          // update search box
-          addSearchBox();
 
           // send to parent
           sendToParent(true, data, status);
         },
         (error) => {
           setAddressInput(MSG_CONST.NO_FETCH);
-
-          // update search box
-          addSearchBox();
 
           // send to parent
           sendToParent(false, {}, error);
@@ -234,7 +227,7 @@ const GMap = (props) => {
    * @description get address from Lat Logn (reverse geocoding)
    */
   const getAddressFromLatLong = (position) => {
-    var geocoder = new window.google.maps.Geocoder();
+    const geocoder = new window.google.maps.Geocoder();
     return new Promise((resolve, reject) => {
       geocoder.geocode({ location: position }, function (results, status) {
         if (status === "OK") {
@@ -359,10 +352,6 @@ const GMap = (props) => {
         mapInitSuccess();
         searchByQueryDebounce = debounce(searchByQueryDebounce, debounceTime);
       };
-
-      // Adding debounce to search query
-
-      // searchByQueryDebounce = debounce(searchByQueryDebounce, debounceTime);
     } else {
       console.error("google map appKey not found!!!");
     }
@@ -375,6 +364,12 @@ const GMap = (props) => {
       addSearchBox();
     }
   }, [mapInstance]);
+
+  useEffect(() => {
+    if (addressInput) {
+      addSearchBox();
+    }
+  }, [addressInput]);
 
   useEffect(() => {
     return () => {
@@ -447,7 +442,7 @@ const GMap = (props) => {
 };
 
 // define component prop types
-GMap.propTypes = {
+GMapify.propTypes = {
   appKey: PropTypes.string,
   lat: PropTypes.number,
   lng: PropTypes.number,
@@ -467,7 +462,7 @@ GMap.propTypes = {
 };
 
 // define default values of prop types
-GMap.defaultProps = {
+GMapify.defaultProps = {
   appKey: "",
   lat: DEFAULT_LAT_LONG.lat,
   lng: DEFAULT_LAT_LONG.lng,
@@ -486,4 +481,4 @@ GMap.defaultProps = {
   children: null
 };
 
-export default GMap;
+export default GMapify;
