@@ -1,7 +1,7 @@
 # g-mapify [![NPM version](https://img.shields.io/npm/v/g-mapify.svg)](https://www.npmjs.com/package/g-mapify) [![Downloads](http://img.shields.io/npm/dm/g-mapify.svg)](https://npmjs.org/package/g-mapify)
 Flexible react google map with more options of search, pick & select.
 
-![g-mapify](https://github.com/bharatpe/g-mapify/blob/master/g-mapify.png)
+![g-mapify](https://raw.githubusercontent.com/bharatpe/g-mapify/master/g-mapify.png)
 
 
 # Getting Started
@@ -32,7 +32,7 @@ Basic use:
 ```
 
 ### Example: Basic map
-![basic map image](https://github.com/bharatpe/react-g-map/blob/master/example/images/basic-map.png?raw=true)
+![basic map image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/basic-map.png?raw=true)
 
 ## Options
 |  Props | Description  | Default value
@@ -76,9 +76,9 @@ Basic use:
 
 
 ### See below pictures
-![Map Search image](https://github.com/bharatpe/react-g-map/blob/master/example/images/map-search2.png?raw=true)
+![Map Search image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/map-search2.png?raw=true)
 
-![Map Search container](https://github.com/bharatpe/react-g-map/blob/master/example/images/map-search1.png?raw=true)
+![Map Search container](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/map-search1.png?raw=true)
 
 
 ## Address Formatter
