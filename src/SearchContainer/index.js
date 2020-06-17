@@ -24,7 +24,6 @@ const SearchContainer = (props) => {
    * @description On search input change
    */
   const onSearchChange = (event) => {
-    console.log("Searching ...", event?.target?.value);
     props.onChange(event?.target?.value);
   };
 
@@ -34,7 +33,6 @@ const SearchContainer = (props) => {
    * @description On animation end
    */
   const onTransitionEndEvent = (event) => {
-    console.log("onTransitionEndEvent -> event", event);
     props.onClose();
   };
 
