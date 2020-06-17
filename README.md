@@ -1,4 +1,4 @@
-# g-mapify [![NPM version](https://img.shields.io/npm/v/g-mapify.svg)](https://www.npmjs.com/package/g-mapify) [![Downloads](http://img.shields.io/npm/dm/g-mapify.svg)](https://npmjs.org/package/g-mapify)
+# g-mapify [![NPM version](https://img.shields.io/npm/v/g-mapify.svg)](https://www.npmjs.com/package/g-mapify) [![Downloads](http://img.shields.io/npm/dm/g-mapify.svg)](https://npmjs.org/package/g-mapify) [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 Flexible react google map with more options of search, pick & select.
 
 ![g-mapify](https://raw.githubusercontent.com/bharatpe/g-mapify/master/g-mapify.png)
