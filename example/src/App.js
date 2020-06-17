@@ -13,13 +13,13 @@ const App = () => {
   const [inputVal, setInputval] = useState('');
   const refs = useRef(null);
 
-  const onMapSelect = useCallback((status, data) => {
+  const onMapSelect = (status, data) => {
     console.warn('Map Data', data);
 
     // get formatted address from google map address_components
     const formattedAddress = AddressFormatter(data.address_components);
     console.warn('formated address', formattedAddress);
-  }, []);
+  };
 
   const onMapButtonClicked = useCallback(() => {
     setShowSearchMap(() => {
