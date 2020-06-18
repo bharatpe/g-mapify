@@ -9,8 +9,6 @@ const DEFAULT_HAS_MARKER = true;
 const DEFAULT_HAS_SEARCH = false;
 const DEFAULT_SEARCH_PLACEHOLDER = "Search here";
 const DEFAULT_LIBRARY_MODE = "places";
-const DEFAULT_MARKER_ICON =
-  "https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png";
 
 const DEFAULT_MAP_OPTIONS = {
   zoom: 15,
@@ -46,6 +44,5 @@ export {
   DEFAULT_HAS_MARKER,
   DEFAULT_HAS_SEARCH,
   DEFAULT_SEARCH_PLACEHOLDER,
-  DEFAULT_LIBRARY_MODE,
-  DEFAULT_MARKER_ICON
+  DEFAULT_LIBRARY_MODE
 };

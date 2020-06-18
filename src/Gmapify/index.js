@@ -5,6 +5,8 @@ import cx from "classnames";
 import PropTypes from "prop-types";
 import SearchContainer from "../SearchContainer";
 import debounce from "../utils/debounce";
+import searchIcon from "../assets/search-icon.png";
+import mapmarkerIcon from "../assets/marker.svg";
 import {
   SEARCH_STATE,
   MSG_CONST,
@@ -14,17 +16,19 @@ import {
   DEFAULT_HAS_MARKER,
   DEFAULT_HAS_SEARCH,
   DEFAULT_SEARCH_PLACEHOLDER,
-  DEFAULT_LIBRARY_MODE,
-  DEFAULT_MARKER_ICON
+  DEFAULT_LIBRARY_MODE
 } from "../constants";
 
-const SearchInputComponent = (props) => {
+const SearchComponent = (props) => {
   return (
-    <textarea
-      {...props}
-      placeholder="Search Location"
-      className={cx(styles.mapTextarea, props.className)}
-    />
+    <div {...props} className={cx(styles.mapTextarea, props.className)}>
+      <div className={styles.locationLive} />
+      <div className={styles.locationContainer}>
+        <span className={styles.locationTitle}> Location </span>
+        <span className={styles.address}>{props.value}</span>
+      </div>
+      <img src={searchIcon} className={styles.searchIcon} />
+    </div>
   );
 };
 
@@ -133,9 +137,9 @@ const GMapify = (props) => {
     if (hasSearch) {
       if (defaultSearchPlace.current) {
         ReactDOM.render(
-          <SearchInputComponent
+          <SearchComponent
             value={addressInput}
-            onFocus={() => setShowMapSearch(true)}
+            onClick={() => setShowMapSearch(true)}
             className={inputClassName}
           />,
           defaultSearchPlace.current
@@ -275,13 +279,14 @@ const GMapify = (props) => {
    * @param {String} query
    * @description searchByQuery with debounce time
    */
-  let searchByQueryDebounce = (query) => {
+  const searchByQueryDebounce = debounce((query) => {
     // minimum 3 characters required to search
     if (query && query.length < 3) {
       return;
     }
 
     setSearchState(SEARCH_STATE.PROGRESS);
+    setSearchResults([]);
 
     // find map address by query
     searchByQuery(query).then(
@@ -290,11 +295,10 @@ const GMapify = (props) => {
         setSearchState(SEARCH_STATE.LOAD);
       },
       () => {
-        setSearchResults(searchResults);
         setSearchState(SEARCH_STATE.FAIL);
       }
     );
-  };
+  }, debounceTime);
 
   /**
    * @name onChangeAddressInput
@@ -350,7 +354,6 @@ const GMapify = (props) => {
       window.initMapScript = () => {
         console.log("Map script successfull");
         mapInitSuccess();
-        searchByQueryDebounce = debounce(searchByQueryDebounce, debounceTime);
       };
     } else {
       console.error("google map appKey not found!!!");
@@ -394,7 +397,7 @@ const GMapify = (props) => {
       )}
 
       {hasSearch && !isMapLoadingFailed && !mapSearchPlace && (
-        <div ref={defaultSearchPlace} className={styles.defaultSearchPositoin}>
+        <div ref={defaultSearchPlace} className={styles.defaultSearchPosition}>
           {/* Map default search place here */}
         </div>
       )}
@@ -473,7 +476,7 @@ GMapify.defaultProps = {
   mapSearchPlace: "",
   debounceTime: DEFAULT_DEBOUNCE_TIME, // time in ms
   inputClassName: "",
-  markerIcon: DEFAULT_MARKER_ICON,
+  markerIcon: mapmarkerIcon,
   searchPlaceHolder: DEFAULT_SEARCH_PLACEHOLDER,
   searchClassName: "",
   libraries: DEFAULT_LIBRARY_MODE,

@@ -34,26 +34,8 @@ Basic use:
 ### Example: Basic map
 ![basic map image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/basic-map.png?raw=true)
 
-## Options
-|  Props                        | Description                                           | Default value
-|-------------------------------|-------------------------------------------------------|-------------------------------|
-| appKey                        | google map app key                                    | It's a mandatory options
-|lat                            | default latitude of map                               | 28.7041
-|lng                            | default logitude of map                               | 77.1025
-|mapOptions                     | google map options that you can change or add more    | zoom:  15, zoomControl:  false, mapTypeControl:  false, fullscreenControl:  false, streetViewControl:  false, clickableIcons:  false, mapTypeId:  "roadmap"
-|libraries                      | add more funcationality on google map                 | places
-|mapClassName                   | custom class name for map element                     | 
-|hasMarker                      | show marker in map                                    | true
-|markerIcon                     | map marker icon                                       | https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png
-|hasSearch                      | apply search in map                                   | false
-|mapSearchPlace                 | map search input box place (required a valid selector name like (#id, .class)) | bottom of the map
-|debounceTime                   | search debounce time (unit *ms*)                      | 2000
-|inputClassName                 | custom class name for Search input                    | 
-|searchPlaceHolder              | placeholder of search box                             | Search here
-|searchClassName                | custom class name of search container                 |
-|onSelect                       | trigger whenever map position changed (return *status: [true/false], data: [map data object], mapStatus: [map native status]*)| 
 
-## Example with options
+## Example with options (Search Map)
 ```javascript
     import  React from  'react';
     import { GMapify } from  'g-mapify';
@@ -76,9 +58,31 @@ Basic use:
 
 
 ### See below pictures
-![Map Search image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/map-search2.png?raw=true)
+![Map Search image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/search-map.png?raw=true)
 
-![Map Search container](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/map-search1.png?raw=true)
+![Map Search container](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/search-map-filter.png?raw=true)
+
+![Map Search desktop](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/search-map-desktop.png?raw=true)
+
+
+## Options
+|  Props                        | Description                                           | Default value
+|-------------------------------|-------------------------------------------------------|-------------------------------|
+|appKey                         | google map app key                                    | It's a mandatory options
+|lat                            | default latitude of map                               | 28.7041
+|lng                            | default logitude of map                               | 77.1025
+|mapOptions                     | google map options that you can change or add more    | zoom:  15, zoomControl:  false, mapTypeControl:  false, fullscreenControl:  false, streetViewControl:  false, clickableIcons:  false, mapTypeId:  "roadmap"
+|libraries                      | add more funcationality on google map                 | places
+|mapClassName                   | custom class name for map element                     | 
+|hasMarker                      | show marker in map                                    | true
+|markerIcon                     | map marker icon                                       | https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png
+|hasSearch                      | apply search in map                                   | false
+|mapSearchPlace                 | map search input box place (required a valid selector name like (#id, .class)) | bottom of the map
+|debounceTime                   | search debounce time (unit *ms*)                      | 2000
+|inputClassName                 | custom class name for Search input                    | 
+|searchPlaceHolder              | placeholder of search box                             | Search here
+|searchClassName                | custom class name of search container                 |
+|onSelect                       | trigger whenever map position changed (return *status: [true/false], data: [map data object], mapStatus: [map native status]*)| 
 
 
 ## Address Formatter
