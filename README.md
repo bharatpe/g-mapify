@@ -32,7 +32,7 @@ Basic use:
 ```
 
 ### Example: Basic map
-![basic map image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/basic-map.png?raw=true)
+![basic map image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/basicmap.png?raw=true)
 
 
 ## Example with options (Search Map)
@@ -56,8 +56,6 @@ Basic use:
  #### Note
  If *status* is getting *false* that means something happened bad on location search.
 
-
-### See below pictures
 ![Map Search image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/search-map.png?raw=true)
 
 ![Map Search container](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/search-map-filter.png?raw=true)
