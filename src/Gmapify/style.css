@@ -37,30 +37,48 @@
 	background-repeat: no-repeat;
 }
 
-.defaultSearchPositoin {
-	position: absolute;
-	bottom: 0;
+.defaultSearchPosition {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 	width: 100%;
-	text-align: center;
+	max-width: 500px;
+    transform: translate(-50%, -120px);
+}
+
+.defaultSearchPosition:before {
+	content: "";
+	position: absolute;
+    width: 0px;
+	height: 30px;
+	border: 1px dashed #0395ad;
+    margin-left: -1px;
+    left: 50%;
+    top: 49px;
+}
+
+.defaultSearchPosition:after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    margin-left: -11px;
+    left: 50%;
+    top: 49px;
+    box-sizing: border-box;
+    border: 7px solid #d2bcbc;
+    border-color: transparent transparent #ffffff #ffffff;
+    transform-origin: 0 0;
+    transform: rotate(-45deg);
+    box-shadow: -4px 3px 4px 0 rgba(0, 0, 0, 0.2);
 }
 
 .searchLoading {
 	width: 100%;
 	text-align: center;
-}
-
-.mapTextarea {
-	min-height: 46px;
-    max-height: 60px;
-    box-sizing: border-box;
-    width: 96%;
-    max-width: 100%;
-    min-width: 50%;
-    padding: 4px 10px;
-    border: 1px solid #ddd;
-    box-shadow: 0px 2px 0px #ddd;
-    resize: none;
-    margin-bottom: 3px;
 }
 
 .mapItemUL {
@@ -87,4 +105,63 @@
 .searchH2 {
 	color: #8d8b97;
 	font-size: 0.75rem;
+}
+
+
+.mapTextarea {
+	height: 50px;
+    box-sizing: border-box;
+    width: 93%;
+    max-width: 100%;
+    min-width: 50%;
+    padding: 4px 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 0 #ddd;
+    resize: none;
+    margin-bottom: 3px;
+    display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background: #fff;
+	border-radius: 4px;
+	box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.26);
+}
+
+.locationLive {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #32cd32;
+	display: block;
+	margin-left: 5px;
+}
+
+.locationContainer {
+	display: flex;
+    flex-direction: column;
+    width: calc(100% - 50px);
+    box-sizing: border-box;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding-left: 2px;
+}
+
+.locationTitle {
+	font-size: 12px;
+	color: #999;
+}
+
+.address {
+	font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    text-align: left;
+    margin: 3px 0px;
+}
+
+.searchIcon {
+	width: 18px;
 }
