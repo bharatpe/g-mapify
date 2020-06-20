@@ -5,7 +5,6 @@ import cx from "classnames";
 import PropTypes from "prop-types";
 import SearchContainer from "../SearchContainer";
 import debounce from "../utils/debounce";
-import searchIcon from "../assets/search-icon.png";
 import mapmarkerIcon from "../assets/marker.svg";
 import {
   SEARCH_STATE,
@@ -18,25 +17,12 @@ import {
   DEFAULT_SEARCH_PLACEHOLDER,
   DEFAULT_LIBRARY_MODE
 } from "../constants";
-
-const SearchComponent = (props) => {
-  return (
-    <div {...props} className={cx(styles.mapTextarea, props.className)}>
-      <div className={styles.locationLive} />
-      <div className={styles.locationContainer}>
-        <span className={styles.locationTitle}> Location </span>
-        <span className={styles.address}>{props.value}</span>
-      </div>
-      <img src={searchIcon} className={styles.searchIcon} />
-    </div>
-  );
-};
+import { injectMapScript, getAddressFromLatLong } from "../utils/common";
+import SearchComponent from "../components/SearchComponent";
 
 const GMapify = (props) => {
   const {
     appKey,
-    lat,
-    lng,
     mapOptions,
     mapClassName,
     hasMarker,
@@ -49,8 +35,12 @@ const GMapify = (props) => {
     searchClassName,
     libraries,
     children,
-    onSelect
+    onSelect,
+    customMarkers,
+    autocenter
   } = props;
+
+  let { lat, lng } = props;
 
   const [searchResults, setSearchResults] = useState([]);
   const [showMapSearch, setShowMapSearch] = useState(false);
@@ -59,6 +49,11 @@ const GMapify = (props) => {
   const [mapLastPosition, setMapLastPosition] = useState({});
   const [addressInput, setAddressInput] = useState("");
   const [mapInstance, setMapInstance] = useState(null);
+
+  if (customMarkers && customMarkers.length > 0) {
+    lat = customMarkers[0][0];
+    lng = customMarkers[0][1];
+  }
 
   // store google map render element instance
   const mapElemRef = useRef(null);
@@ -89,10 +84,7 @@ const GMapify = (props) => {
         sendToParent(false, { message: MSG_CONST.MAP_NOT_LOADED }, -1);
       };
 
-      const scriptElem = document.createElement("script");
-      scriptElem.src = `https://maps.googleapis.com/maps/api/js?key=${appKey}&callback=initMapScript&libraries=${libraries}`;
-      scriptElem.setAttribute("id", "google-map");
-      document.querySelector("head").appendChild(scriptElem);
+      injectMapScript(appKey, libraries);
     } else {
       // skip to add google map script when already added
       mapInitSuccess();
@@ -159,7 +151,7 @@ const GMapify = (props) => {
    * @description add events to google map
    */
   const addEvents = () => {
-    if (mapInstance && hasMarker) {
+    if (mapInstance && hasMarker && autocenter) {
       // bind dragend event for fetch map center lat long
       mapInstance.addListener("dragend", () => {
         setMapPosition(mapInstance.center.lat(), mapInstance.center.lng());
@@ -167,6 +159,7 @@ const GMapify = (props) => {
 
       // bind zoom change event because always need to zoom from center
       mapInstance.addListener("zoom_changed", () => {
+        console.log("Last position", mapLastPosition);
         setMapPosition(mapLastPosition.lat, mapLastPosition.lng);
       });
     }
@@ -222,30 +215,8 @@ const GMapify = (props) => {
     }
 
     // save map last position
+    console.log("setMapLastPosition", position);
     setMapLastPosition(position);
-  };
-
-  /**
-   * @name getAddressFromLatLong
-   * @param {*} position
-   * @description get address from Lat Logn (reverse geocoding)
-   */
-  const getAddressFromLatLong = (position) => {
-    const geocoder = new window.google.maps.Geocoder();
-    return new Promise((resolve, reject) => {
-      geocoder.geocode({ location: position }, function (results, status) {
-        if (status === "OK") {
-          if (results[0]) {
-            resolve(results[0], status);
-          } else {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject(-1);
-          }
-        } else {
-          reject(status);
-        }
-      });
-    });
   };
 
   /**
@@ -261,8 +232,6 @@ const GMapify = (props) => {
       };
 
       const service = new window.google.maps.places.PlacesService(mapInstance);
-
-      console.log("Service", service, mapInstance);
 
       service.textSearch(request, (results, status) => {
         if (status === window.google.maps.places.PlacesServiceStatus.OK) {
@@ -345,6 +314,28 @@ const GMapify = (props) => {
     }
   };
 
+  const addMarkers = () => {
+    if (customMarkers) {
+      customMarkers.forEach((item) => {
+        console.log(
+          "Setting marker",
+          item,
+          new window.google.maps.LatLng(item[0], item[1]),
+          mapInstance
+        );
+        // eslint-disable-next-line no-new
+        const marker = new window.google.maps.Marker({
+          position: new window.google.maps.LatLng(item[0], item[1]),
+          map: mapInstance,
+          title: "Hello World!",
+          visible: true,
+          icon: markerIcon
+        });
+        marker.setMap(mapInstance);
+      });
+    }
+  };
+
   useEffect(() => {
     if (appKey) {
       // call to insert google map script
@@ -365,6 +356,7 @@ const GMapify = (props) => {
       setMapPosition(lat, lng);
       addEvents();
       addSearchBox();
+      addMarkers();
     }
   }, [mapInstance]);
 
@@ -387,7 +379,7 @@ const GMapify = (props) => {
       </div>
 
       {/* map marker icon */}
-      {hasMarker && !isMapLoadingFailed && (
+      {hasMarker && autocenter && !isMapLoadingFailed && (
         <div
           className={styles.markerIcon}
           style={{ backgroundImage: `url(${markerIcon})` }}
@@ -453,6 +445,7 @@ GMapify.propTypes = {
   mapClassName: PropTypes.string,
   hasMarker: PropTypes.bool,
   hasSearch: PropTypes.bool,
+  autocenter: PropTypes.bool,
   mapSearchPlace: PropTypes.string,
   debounceTime: PropTypes.number,
   inputClassName: PropTypes.string,
@@ -461,7 +454,8 @@ GMapify.propTypes = {
   searchClassName: PropTypes.string,
   libraries: PropTypes.string,
   onSelect: PropTypes.func,
-  children: PropTypes.element
+  children: PropTypes.element,
+  customMarkers: PropTypes.array
 };
 
 // define default values of prop types
@@ -473,6 +467,7 @@ GMapify.defaultProps = {
   mapClassName: "",
   hasMarker: DEFAULT_HAS_MARKER,
   hasSearch: DEFAULT_HAS_SEARCH,
+  autocenter: true,
   mapSearchPlace: "",
   debounceTime: DEFAULT_DEBOUNCE_TIME, // time in ms
   inputClassName: "",
@@ -481,7 +476,8 @@ GMapify.defaultProps = {
   searchClassName: "",
   libraries: DEFAULT_LIBRARY_MODE,
   onSelect: () => {},
-  children: null
+  children: null,
+  customMarkers: []
 };
 
 export default GMapify;
