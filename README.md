@@ -110,6 +110,7 @@ const  App = () => {
 #### Note 
 When use customMarkers (More than 1) - Make sure autoCenter, hasSearch are set to false. Which dosen't make sense any way with multiple markers.
 
+
 ## Address Formatter
 You can get City, Pincode, State etc. from *address_components* using **addressFormatter** method. This method transfrom *address_components* array data into *object*.
 ```javascript
@@ -125,6 +126,12 @@ const  onMapSelect = (status, data) => {
     }
 };
 ```
+
+## Refer example for all 3 map variations
+
+![Map variations image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/example.png?raw=true)
+
+
 
 # Releases
 Here [Releases](https://github.com/bharatpe/g-mapify/blob/master/releases.md)
