@@ -40,17 +40,17 @@ Basic use:
 
 ## Example with options (Search Map)
 ```javascript
-    import  React from  'react';
-    import { GMapify } from  'g-mapify';
-    import  'g-mapify/dist/index.css';
+import  React from  'react';
+import { GMapify } from  'g-mapify';
+import  'g-mapify/dist/index.css';
+
+const  App = () => {
+    const  onMapSelect = (status, data) => console.warn(status, data);
     
-    const  App = () => {
-        const  onMapSelect = (status, data) => console.warn(status, data);
-        
-	    return (
-		    <GMapify appKey="[google-map-key]" hasSearch onSelect={onMapSelect}/>
-	    )
-    }
+    return (
+        <GMapify appKey="[google-map-key]" hasSearch onSelect={onMapSelect}/>
+    )
+}
 ```
  #### Note
  If *status* is getting *false* that means something happened bad on location search.
@@ -59,28 +59,28 @@ Basic use:
 
 ## Example with multiple markers
 ```javascript
-    import  React from  'react';
-    import { GMapify } from  'g-mapify';
-    import  'g-mapify/dist/index.css';
+import  React from  'react';
+import { GMapify } from  'g-mapify';
+import  'g-mapify/dist/index.css';
+
+const  App = () => {
+
+    const markers = [
+        [28.4165425, 77.0437857, "Hello 1"],
+        [28.415671, 77.0520993, `<div><h3>Southcity 2</h3> <img src="https://www.rentomojo.com/blog/wp-content/uploads/2019/07/shutterstock_1298400742.jpg" height="140"/> </div>`],
+        [28.4175717, 77.05284840000002]
+    ]
+
+    const  onMapSelect = (status, data) => console.warn(status, data);
     
-    const  App = () => {
-
-        const markers = [
-            [28.4165425, 77.0437857, "Hello 1"],
-            [28.415671, 77.0520993, `<div><h3>Southcity 2</h3> <img src="https://www.rentomojo.com/blog/wp-content/uploads/2019/07/shutterstock_1298400742.jpg" height="140"/> </div>`],
-            [28.4175717, 77.05284840000002]
-        ]
-
-        const  onMapSelect = (status, data) => console.warn(status, data);
-        
-	    return (
-            <GMapify 
-            appKey="[google-map-key]" 
-            customMarkers={markers}
-            autoCenter={false}
-            onSelect={onMapSelect}/>
-	    )
-    }
+    return (
+        <GMapify 
+        appKey="[google-map-key]" 
+        customMarkers={markers}
+        autoCenter={false}
+        onSelect={onMapSelect}/>
+    )
+}
 ```
 
 ![Map Mutiple markers image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/markers-map.png?raw=true)
@@ -113,17 +113,17 @@ When use customMarkers (More than 1) - Make sure autoCenter, hasSearch are set t
 ## Address Formatter
 You can get City, Pincode, State etc. from *address_components* using **addressFormatter** method. This method transfrom *address_components* array data into *object*.
 ```javascript
-    import { GMapify, AddressFormatter } from  'g-mapify'
-    
-    const  onMapSelect = (status, data) => {
-        if (status) {
-            console.warn('Map Data', data);
-            
-		    // get formatted address from google map address_components
-		    const  formattedAddress = AddressFormatter(data.address_components);
-		    console.warn('formated address', formattedAddress);
-		}
-    };
+import { GMapify, AddressFormatter } from  'g-mapify'
+
+const  onMapSelect = (status, data) => {
+    if (status) {
+        console.warn('Map Data', data);
+        
+        // get formatted address from google map address_components
+        const  formattedAddress = AddressFormatter(data.address_components);
+        console.warn('formated address', formattedAddress);
+    }
+};
 ```
 
 # Releases
