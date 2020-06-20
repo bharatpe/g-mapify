@@ -4,9 +4,6 @@ Flexible react google map with more options of search, pick & select.
 ![g-mapify](https://raw.githubusercontent.com/bharatpe/g-mapify/master/g-mapify.png)
 
 
-![g-mapify](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/g-mapify.png)
-
-
 # Getting Started
 
 ```javascript
@@ -45,7 +42,11 @@ Basic use:
     import  'g-mapify/dist/index.css';
     
     const  App = () => {
-        const  onMapSelect = (status, data) => console.warn(status, data);
+        const  onMapSelect = (status, data)=> {
+            if (status) {
+	            console.warn(status, data);
+	        }
+        };
         
 	    return (
 		    <GMapify appKey="[google-map-key]" hasSearch onSelect={onMapSelect}/>
@@ -65,40 +66,38 @@ Basic use:
 ## Options
 |  Props                        | Description                                           | Default value
 |-------------------------------|-------------------------------------------------------|-------------------------------|
-|appKey (Mandatory)             | google map app key                                    | It's a mandatory value
+|appKey                         | google map app key                                    | It's a mandatory options
 |lat                            | default latitude of map                               | 28.7041
 |lng                            | default logitude of map                               | 77.1025
 |mapOptions                     | google map options that you can change or add more    | zoom:  15, zoomControl:  false, mapTypeControl:  false, fullscreenControl:  false, streetViewControl:  false, clickableIcons:  false, mapTypeId:  "roadmap"
 |libraries                      | add more funcationality on google map                 | places
-|mapClassName                   | custom class name for map element                     | None
+|mapClassName                   | custom class name for map element                     | 
 |hasMarker                      | show marker in map                                    | true
-|markerIcon                     | map marker icon                                       | Blue marker icon
-|autocenter                     | Auto center map on move or zoom                       | true
-|customMarkers                  | Multiple custom markers to mark on map                | [] (Example :  [[lat, lng], [lat, lng], ...] )
+|markerIcon                     | map marker icon                                       | https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png
 |hasSearch                      | apply search in map                                   | false
 |mapSearchPlace                 | map search input box place (required a valid selector name like (#id, .class)) | bottom of the map
 |debounceTime                   | search debounce time (unit *ms*)                      | 2000
-|inputClassName                 | custom class name for Search input                    | None
+|inputClassName                 | custom class name for Search input                    | 
 |searchPlaceHolder              | placeholder of search box                             | Search here
-|searchClassName                | custom class name of search container                 | None
+|searchClassName                | custom class name of search container                 |
 |onSelect                       | trigger whenever map position changed (return *status: [true/false], data: [map data object], mapStatus: [map native status]*)| 
 
 
 ## Address Formatter
 You can get City, Pincode, State etc. from *address_components* using **addressFormatter** method. This method transfrom *address_components* array data into *object*.
-```javascript
+
     import { GMapify, AddressFormatter } from  'g-mapify'
     
     const  onMapSelect = (status, data) => {
         if (status) {
-            console.warn('Map Data', data);
-            
+	        console.warn('Map Data', data);
+    
 		    // get formatted address from google map address_components
 		    const  formattedAddress = AddressFormatter(data.address_components);
 		    console.warn('formated address', formattedAddress);
-		}
+		    }
     };
-```
+
 
 # Releases
 Here [Releases](https://github.com/bharatpe/g-mapify/blob/master/releases.md)
