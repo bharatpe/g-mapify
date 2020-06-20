@@ -37,7 +37,7 @@ const GMapify = (props) => {
     children,
     onSelect,
     customMarkers,
-    autocenter
+    autoCenter
   } = props;
 
   let { lat, lng } = props;
@@ -151,7 +151,7 @@ const GMapify = (props) => {
    * @description add events to google map
    */
   const addEvents = () => {
-    if (mapInstance && hasMarker && autocenter) {
+    if (mapInstance && hasMarker && autoCenter) {
       // bind dragend event for fetch map center lat long
       mapInstance.addListener("dragend", () => {
         setMapPosition(mapInstance.center.lat(), mapInstance.center.lng());
@@ -331,6 +331,17 @@ const GMapify = (props) => {
           visible: true,
           icon: markerIcon
         });
+
+        if (item[2]) {
+          const infowindow = new window.google.maps.InfoWindow({
+            content: item[2]
+          });
+
+          marker.addListener("click", () => {
+            infowindow.open(mapInstance, marker);
+          });
+        }
+
         marker.setMap(mapInstance);
       });
     }
@@ -379,7 +390,7 @@ const GMapify = (props) => {
       </div>
 
       {/* map marker icon */}
-      {hasMarker && autocenter && !isMapLoadingFailed && (
+      {hasMarker && autoCenter && !isMapLoadingFailed && (
         <div
           className={styles.markerIcon}
           style={{ backgroundImage: `url(${markerIcon})` }}
@@ -445,7 +456,7 @@ GMapify.propTypes = {
   mapClassName: PropTypes.string,
   hasMarker: PropTypes.bool,
   hasSearch: PropTypes.bool,
-  autocenter: PropTypes.bool,
+  autoCenter: PropTypes.bool,
   mapSearchPlace: PropTypes.string,
   debounceTime: PropTypes.number,
   inputClassName: PropTypes.string,
@@ -467,7 +478,7 @@ GMapify.defaultProps = {
   mapClassName: "",
   hasMarker: DEFAULT_HAS_MARKER,
   hasSearch: DEFAULT_HAS_SEARCH,
-  autocenter: true,
+  autoCenter: true,
   mapSearchPlace: "",
   debounceTime: DEFAULT_DEBOUNCE_TIME, // time in ms
   inputClassName: "",

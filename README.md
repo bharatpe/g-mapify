@@ -55,11 +55,35 @@ Basic use:
  #### Note
  If *status* is getting *false* that means something happened bad on location search.
 
-![Map Search image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/search-map.png?raw=true)
+![Map Search image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/search-map-desktop.png?raw=true)
 
-![Map Search container](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/search-map-filter.png?raw=true)
+## Example with multiple markers
+```javascript
+    import  React from  'react';
+    import { GMapify } from  'g-mapify';
+    import  'g-mapify/dist/index.css';
+    
+    const  App = () => {
 
-![Map Search desktop](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/search-map-desktop.png?raw=true)
+        const markers = [
+            [28.4165425, 77.0437857, "Hello 1"],
+            [28.415671, 77.0520993, `<div><h3>Southcity 2</h3> <img src="https://www.rentomojo.com/blog/wp-content/uploads/2019/07/shutterstock_1298400742.jpg" height="140"/> </div>`],
+            [28.4175717, 77.05284840000002]
+        ]
+
+        const  onMapSelect = (status, data) => console.warn(status, data);
+        
+	    return (
+            <GMapify 
+            appKey="[google-map-key]" 
+            customMarkers={markers}
+            autoCenter={false}
+            onSelect={onMapSelect}/>
+	    )
+    }
+```
+
+![Map Search image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/markers-map.png?raw=true)
 
 
 ## Options
@@ -73,8 +97,8 @@ Basic use:
 |mapClassName                   | custom class name for map element                     | None
 |hasMarker                      | show marker in map                                    | true
 |markerIcon                     | map marker icon                                       | Blue marker icon
-|autocenter                     | Auto center map on move or zoom                       | true
-|customMarkers                  | Multiple custom markers to mark on map                | [] (Example :  [[lat, lng], [lat, lng], ...] )
+|autoCenter                     | Auto center map on move or zoom                       | true
+|customMarkers                  | Multiple custom markers to mark on map                | [] (Example :  [[lat, lng, content], [lat, lng, content], ...] )
 |hasSearch                      | apply search in map                                   | false
 |mapSearchPlace                 | map search input box place (required a valid selector name like (#id, .class)) | bottom of the map
 |debounceTime                   | search debounce time (unit *ms*)                      | 2000
