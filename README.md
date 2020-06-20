@@ -83,7 +83,7 @@ Basic use:
     }
 ```
 
-![Map Search image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/markers-map.png?raw=true)
+![Map Mutiple markers image](https://raw.githubusercontent.com/bharatpe/g-mapify/master/example/images/markers-map.png?raw=true)
 
 
 ## Options
@@ -107,6 +107,8 @@ Basic use:
 |searchClassName                | custom class name of search container                 | None
 |onSelect                       | trigger whenever map position changed (return *status: [true/false], data: [map data object], mapStatus: [map native status]*)| 
 
+#### Note 
+When use customMarkers (More than 1) - Make sure autoCenter, hasSearch are set to false. Which dosen't make sense any way with multiple markers.
 
 ## Address Formatter
 You can get City, Pincode, State etc. from *address_components* using **addressFormatter** method. This method transfrom *address_components* array data into *object*.
