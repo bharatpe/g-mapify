@@ -1,17 +1,25 @@
 import React, { useCallback, useState, useRef } from 'react'
-
 import { GMapify, AddressFormatter } from 'g-mapify'
 import 'g-mapify/dist/index.css'
+import './index.css'
 // import InputDefault from './components/Input';
+
+const BASIC = 'basic_map';
+const SEARCH_MAP = 'search_map';
+const MULTIPLE_MARKER = 'marker_map';
 
 const App = () => {
   const mapOptions = {
     zoom: 15
   };
 
-  const [showSearchMap, setShowSearchMap] = useState(false);
-  const [inputVal, setInputval] = useState('');
-  const refs = useRef(null);
+  const markers = [
+    [28.4165425, 77.0437857, "Hello 1"],
+    [28.415671, 77.0520993, `<div><h3>Southcity 2</h3> <img src="https://www.rentomojo.com/blog/wp-content/uploads/2019/07/shutterstock_1298400742.jpg" height="140"/> </div>`],
+    [28.4175717, 77.05284840000002, "<h1> Location </h1>"]
+  ]
+
+  const [mapType, setmapType] = useState(BASIC);
 
   const onMapSelect = (status, data) => {
     console.warn('Map Data', data);
@@ -21,30 +29,21 @@ const App = () => {
     console.warn('formated address', formattedAddress);
   };
 
-  const onMapButtonClicked = useCallback(() => {
-    setShowSearchMap(() => {
-      return !showSearchMap;
-    });
-  }, [showSearchMap]);
-
   return (
   <>
-    <button onClick={onMapButtonClicked} disabled={!showSearchMap}>Basic Map</button>
-    <button onClick={onMapButtonClicked} disabled={showSearchMap}>Search Map</button>
+    <button onClick={() => setmapType(BASIC)} disabled={mapType === BASIC}>Basic Map</button>
+    <button onClick={() => setmapType(SEARCH_MAP)} disabled={mapType === SEARCH_MAP}>Search Map</button>
+    <button onClick={() => setmapType(MULTIPLE_MARKER)} disabled={mapType === MULTIPLE_MARKER}>Custom Map</button>
     
-     { 
-      !showSearchMap ?
-      (
-        // Basic example
-        <GMapify key={1} mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-100" />
-      )
-      :
-      (
-        // example with additional options
-        <GMapify key={2} mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-100" hasSearch onSelect={onMapSelect} />
-      )
+    { 
+      mapType === BASIC && <GMapify key={1} mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-100" />
     }
-
+    { 
+      mapType === SEARCH_MAP && <GMapify key={2} mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-100" hasSearch onSelect={onMapSelect} />
+    }
+    { 
+      mapType === MULTIPLE_MARKER && <GMapify key={3} mapOptions={mapOptions} appKey="AIzaSyBeZ5-CnQtbhPaEr2u162G-SoCF44lQRAg" mapClassName="h-100" autoCenter={false} customMarkers={markers} onSelect={onMapSelect} />
+    }
   </>
   )
 }
