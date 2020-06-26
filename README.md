@@ -99,6 +99,7 @@ const  App = () => {
 |markerIcon                     | map marker icon                                       | Blue marker icon
 |autoCenter                     | Auto center map on move or zoom                       | true
 |customMarkers                  | Multiple custom markers to mark on map                | [] (Example :  [[lat, lng, content], [lat, lng, content], ...] )
+|allowSinglePopup               | Allow to open single popup on click custom marker     | true
 |hasSearch                      | apply search in map                                   | false
 |mapSearchPlace                 | map search input box place (required a valid selector name like (#id, .class)) | bottom of the map
 |debounceTime                   | search debounce time (unit *ms*)                      | 2000
