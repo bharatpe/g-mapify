@@ -37,7 +37,8 @@ const GMapify = (props) => {
     children,
     onSelect,
     customMarkers,
-    autoCenter
+    autoCenter,
+    allowSinglePopup
   } = props;
 
   let { lat, lng } = props;
@@ -316,6 +317,7 @@ const GMapify = (props) => {
 
   const addMarkers = () => {
     if (customMarkers) {
+      let infowindow = null;
       customMarkers.forEach((item) => {
         console.log(
           "Setting marker",
@@ -333,11 +335,14 @@ const GMapify = (props) => {
         });
 
         if (item[2]) {
-          const infowindow = new window.google.maps.InfoWindow({
-            content: item[2]
-          });
-
           marker.addListener("click", () => {
+            if (allowSinglePopup && infowindow) {
+              infowindow.close();
+            }
+
+            infowindow = new window.google.maps.InfoWindow({
+              content: item[2]
+            });
             infowindow.open(mapInstance, marker);
           });
         }
@@ -466,7 +471,8 @@ GMapify.propTypes = {
   libraries: PropTypes.string,
   onSelect: PropTypes.func,
   children: PropTypes.element,
-  customMarkers: PropTypes.array
+  customMarkers: PropTypes.array,
+  allowSinglePopup: PropTypes.bool
 };
 
 // define default values of prop types
@@ -488,7 +494,8 @@ GMapify.defaultProps = {
   libraries: DEFAULT_LIBRARY_MODE,
   onSelect: () => {},
   children: null,
-  customMarkers: []
+  customMarkers: [],
+  allowSinglePopup: true
 };
 
 export default GMapify;
