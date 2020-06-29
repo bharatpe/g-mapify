@@ -31,7 +31,7 @@ const SEARCH_STATE = {
 const MSG_CONST = {
   NO_FETCH: "Unable to fetch location",
   NO_RESULT: "No Results Found",
-  LOADING: "Loading...",
+  LOADING: "Searching...",
   MAP_NOT_LOADED: "Map load failed!"
 };
 

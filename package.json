@@ -1,6 +1,6 @@
 {
   "name": "g-mapify",
-  "version": "1.4.0",
+  "version": "2.1.0",
   "description": "Flexible react google map with more options of search, pick & select.",
   "author": "BharatPe TM",
   "license": "ISC",
@@ -11,6 +11,19 @@
   "engines": {
     "node": ">=10"
   },
+  "keywords": [
+    "React",
+    "Google",
+    "Map",
+    "react-component",
+    "google-map-react",
+    "google-map-mobile",
+    "flexible-google-map",
+    "GoogleMap",
+    "InfoWindow",
+    "Marker",
+    "withGoogleMap"
+  ],
   "scripts": {
     "build": "microbundle-crl --compress --no-sourcemap --define process.env.NODE_ENV=production --format modern,cjs",
     "build:dev": "microbundle-crl --compress --no-sourcemap --format modern,cjs",
