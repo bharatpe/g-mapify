@@ -3,6 +3,9 @@ const ADDRESS_TYPE_COUNTRY = "country";
 const ADDRESS_TYPE_ADMIN_LEVEL_1 = "administrative_area_level_1";
 const ADDRESS_TYPE_LOCALITY = "locality";
 const ADDRESS_TYPE_SUB_LOCALITY = "sublocality";
+const ADDRESS_TYPE_ROUTE = "route";
+const ADDRESS_TYPE_PREMISE = "premise";
+const ADDRESS_TYPE_STREET_NUMBER = "street_number";
 
 /**
  * @name formatter
@@ -23,6 +26,13 @@ const formatter = (components = [], currentPos = 0, returnObj = {}) => {
   if (components.length > currentPos) {
     for (const type of types) {
       switch (type) {
+        case ADDRESS_TYPE_STREET_NUMBER:
+        case ADDRESS_TYPE_PREMISE:
+          returnObj.streetNumber = longName;
+          break;
+        case ADDRESS_TYPE_ROUTE:
+          returnObj.route = longName;
+          break;
         case ADDRESS_TYPE_POSTAL_CODE:
           returnObj.pin = longName;
           break;
