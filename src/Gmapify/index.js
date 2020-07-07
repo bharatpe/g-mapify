@@ -370,7 +370,6 @@ const GMapify = (props) => {
   useEffect(() => {
     if (mapInstance) {
       setMapPosition(lat, lng);
-      addEvents();
       addSearchBox();
       addMarkers();
     }
@@ -383,10 +382,11 @@ const GMapify = (props) => {
   }, [addressInput]);
 
   useEffect(() => {
+    addEvents();
     return () => {
       removeEvents();
     };
-  }, []);
+  }, [mapLastPosition]);
 
   return (
     <div className={cx(styles.mapContainer, mapClassName)}>
