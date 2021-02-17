@@ -76,20 +76,20 @@ const GMapify = (props) => {
    * @description add google map script file to project
    */
   const insertMapScript = () => {
-    const isGMapifyScriptAdded = document.head.querySelector("#google-map");
+    // error occured in Google Map loading
+    window.gm_authFailure = () => {
+      setIsMapLoadingFailed(true);
+      sendToParent(false, { message: MSG_CONST.MAP_NOT_LOADED }, -1);
+    };
 
-    if (!isGMapifyScriptAdded) {
-      // error occured in Google Map loading
-      window.gm_authFailure = () => {
-        setIsMapLoadingFailed(true);
-        sendToParent(false, { message: MSG_CONST.MAP_NOT_LOADED }, -1);
-      };
-
-      injectMapScript(appKey, libraries);
-    } else {
-      // skip to add google map script when already added
-      mapInitSuccess();
-    }
+    injectMapScript(appKey, libraries)
+      .then(() => {
+        mapInitSuccess();
+        setIsMapLoadingFailed(false);
+      })
+      .catch(() => {
+        console.error("google map library loading error!");
+      });
   };
 
   /**
@@ -109,8 +109,6 @@ const GMapify = (props) => {
     };
 
     // create google map instance
-    console.log("MAP INSTANXE", mapElemRef.current);
-
     if (mapElemRef.current) {
       setMapInstance(
         new window.google.maps.Map(mapElemRef.current, {
@@ -160,7 +158,6 @@ const GMapify = (props) => {
 
       // bind zoom change event because always need to zoom from center
       mapInstance.addListener("zoom_changed", () => {
-        console.log("Last position", mapLastPosition);
         setMapPosition(mapLastPosition.lat, mapLastPosition.lng);
       });
     }
@@ -216,7 +213,6 @@ const GMapify = (props) => {
     }
 
     // save map last position
-    console.log("setMapLastPosition", position);
     setMapLastPosition(position);
   };
 
@@ -319,12 +315,6 @@ const GMapify = (props) => {
     if (customMarkers) {
       let infowindow = null;
       customMarkers.forEach((item) => {
-        console.log(
-          "Setting marker",
-          item,
-          new window.google.maps.LatLng(item[0], item[1]),
-          mapInstance
-        );
         // eslint-disable-next-line no-new
         const marker = new window.google.maps.Marker({
           position: new window.google.maps.LatLng(item[0], item[1]),
@@ -356,12 +346,6 @@ const GMapify = (props) => {
     if (appKey) {
       // call to insert google map script
       insertMapScript();
-
-      // google map callback
-      window.initMapScript = () => {
-        console.log("Map script successfull");
-        mapInitSuccess();
-      };
     } else {
       console.error("google map appKey not found!!!");
     }
