@@ -112,6 +112,43 @@ const  App = () => {
 When use customMarkers (More than 1) - Make sure autoCenter, hasSearch are set to false. Which dosen't make sense any way with multiple markers.
 
 
+## Using Ref (v2.3.0)
+Support ref to access some functions directly.
+
+```javascript
+    import  React from  'react';
+    import { GMapify } from  'g-mapify';
+    import  'g-mapify/dist/index.css';
+    
+    const  App = () => {
+        const mapRef = useRef();
+
+        const getLatLongByName = async () => {
+            if (mapRef.current) {
+                try {
+                    const result = await mapRef.current.latLongFromQuery('BharatPe Office Delhi');
+                    const lat = result[0]?.geometry.location.lat();
+                    const lng = result[0]?.geometry.location.lng();
+                } catch (e) {
+                    // handle error
+                }
+            }
+        };
+
+	    return (
+            <>
+                <button onClick={getLatLongByName}>BharatPe Office Location</button>
+                <GMapify ref={mapRef} appKey="[google-map-key]" />
+            </>
+	    )
+    }
+```
+Functions are accessible directly:
+
+|  Function                     | Description                                              | Parameters                    | Return Value
+|-------------------------------|----------------------------------------------------------|-------------------------------|-------------------------
+|latLongFromQuery               | Get Map data from address string without showing search  | string                        |  `Promise<map data>`
+
 ## Address Formatter
 You can get City, Pincode, State etc. from *address_components* using **addressFormatter** method. This method transfrom *address_components* array data into *object*.
 ```javascript
