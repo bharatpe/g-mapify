@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle
+} from "react";
 import ReactDOM from "react-dom";
 import styles from "./style.css";
 import cx from "classnames";
@@ -20,7 +26,7 @@ import {
 import { injectMapScript, getAddressFromLatLong } from "../utils/common";
 import SearchComponent from "../components/SearchComponent";
 
-const GMapify = (props) => {
+const GMapify = forwardRef((props, ref) => {
   const {
     appKey,
     mapOptions,
@@ -372,6 +378,12 @@ const GMapify = (props) => {
     };
   }, [mapLastPosition]);
 
+  useImperativeHandle(ref, () => ({
+    latLongFromQuery: async (query) => {
+      return await searchByQuery(query, mapInstance);
+    }
+  }));
+
   return (
     <div className={cx(styles.mapContainer, mapClassName)}>
       <div ref={mapElemRef} className={styles.map}>
@@ -434,7 +446,7 @@ const GMapify = (props) => {
       )}
     </div>
   );
-};
+});
 
 // define component prop types
 GMapify.propTypes = {
