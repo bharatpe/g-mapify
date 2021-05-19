@@ -1,6 +1,6 @@
 {
   "name": "g-mapify",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Flexible react google map with more options of search, pick & select.",
   "author": "BharatPe TM",
   "license": "ISC",
@@ -8,6 +8,7 @@
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
   "source": "src/index.js",
+  "typings": "/index.d.ts",
   "engines": {
     "node": ">=10"
   },
