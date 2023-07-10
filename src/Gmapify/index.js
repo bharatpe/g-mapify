@@ -201,11 +201,12 @@ const GMapify = forwardRef((props, ref) => {
       mapLastPosition.lng !== position.lng
     ) {
       setAddressInput(MSG_CONST.LOADING);
-
+      console.log('Getting address from lat long');
+      console.log(position);
       getAddressFromLatLong(position).then(
         (data, status) => {
           setAddressInput(data.formatted_address);
-
+          console.log(data);
           // send to parent
           sendToParent(true, data, status);
         },
