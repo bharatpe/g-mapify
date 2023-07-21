@@ -87,7 +87,6 @@ const getAddressFromLatLong = (position) => {
     geocoder.geocode({ location: position }, function (results, status) {
       if (status === "OK") {
         if (results[0]) {
-          console.log("results[0]", results[0]);
           resolve(results[0], status);
         } else {
           // eslint-disable-next-line prefer-promise-reject-errors

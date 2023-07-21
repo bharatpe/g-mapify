@@ -201,8 +201,6 @@ const GMapify = forwardRef((props, ref) => {
       mapLastPosition.lng !== position.lng
     ) {
       setAddressInput(MSG_CONST.LOADING);
-      console.log("Getting address from lat long");
-      console.log(position);
 
       const data = {
         geometry: {
@@ -212,23 +210,8 @@ const GMapify = forwardRef((props, ref) => {
           }
         }
       };
-      console.log("data", data);
       sendToParent(true, data, true);
 
-      // getAddressFromLatLong(position).then(
-      //   (data, status) => {
-      //     setAddressInput(data.formatted_address);
-      //     console.log(data);
-      //     // send to parent
-      //     sendToParent(true, data, status);
-      //   },
-      //   (error) => {
-      //     setAddressInput(MSG_CONST.NO_FETCH);
-
-      //     // send to parent
-      //     sendToParent(false, {}, error);
-      //   }
-      // );
     }
 
     // save map last position
