@@ -23,7 +23,7 @@ import {
   DEFAULT_SEARCH_PLACEHOLDER,
   DEFAULT_LIBRARY_MODE
 } from "../constants";
-import { injectMapScript, getAddressFromLatLong } from "../utils/common";
+import { injectMapScript } from "../utils/common";
 import SearchComponent from "../components/SearchComponent";
 
 const GMapify = forwardRef((props, ref) => {
@@ -202,20 +202,16 @@ const GMapify = forwardRef((props, ref) => {
     ) {
       setAddressInput(MSG_CONST.LOADING);
 
-      getAddressFromLatLong(position).then(
-        (data, status) => {
-          setAddressInput(data.formatted_address);
-
-          // send to parent
-          sendToParent(true, data, status);
-        },
-        (error) => {
-          setAddressInput(MSG_CONST.NO_FETCH);
-
-          // send to parent
-          sendToParent(false, {}, error);
+      const data = {
+        geometry: {
+          location: {
+            lat: lat,
+            lng: lng
+          }
         }
-      );
+      };
+      sendToParent(true, data, true);
+
     }
 
     // save map last position
