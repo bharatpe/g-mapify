@@ -1109,10 +1109,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@bp/g-mapify@^4.1.0":
-  version "4.1.0"
-  resolved "https://npm.bharatpe.io/@bp/g-mapify/-/g-mapify-4.1.0.tgz#30f0ff53ccda75e9d04627afc8e915f55345ce0a"
-  integrity sha512-MUjwH8GBqDrFPqu6dZeAo45E0YyqN0Ry+SXvBgoRfYQ/ylXt94E0YkqGayappC9CUvHIkg0UrLcM1Nzych12zQ==
+"@bp/g-mapify@^4.3.0":
+  version "4.3.0"
+  resolved "https://npm.bharatpe.io/@bp/g-mapify/-/g-mapify-4.3.0.tgz#06560716b30d1e7a46f29db213c576f95f3d87b0"
+  integrity sha512-2m/4hAv1Ef3NW60i3D1QgPMQ8oDyTF+1btQZkV75obDS77FmEXYQ5kEZ6Pp6UOv7n6cmaalYc9aNF5kpBi2i2g==
 
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"
