@@ -16,7 +16,6 @@ import {
   SEARCH_STATE,
   MSG_CONST,
   DEFAULT_LAT_LONG,
-  DEFAULT_MAP_OPTIONS,
   DEFAULT_DEBOUNCE_TIME,
   DEFAULT_HAS_MARKER,
   DEFAULT_HAS_SEARCH,
@@ -30,7 +29,6 @@ const GMapify = forwardRef((props, ref) => {
   const {
     apiKey,
     mapOptions,
-    mapClassName,
     hasMarker,
     hasSearch,
     mapSearchPlace,
@@ -56,6 +54,7 @@ const GMapify = forwardRef((props, ref) => {
   const [mapLastPosition, setMapLastPosition] = useState({});
   const [addressInput, setAddressInput] = useState("");
   const [mapInstance, setMapInstance] = useState(null);
+  const [markerInstance, setMarkerInstance] = useState(null);
 
   if (customMarkers && customMarkers.length > 0) {
     lat = customMarkers[0][0];
@@ -82,13 +81,13 @@ const GMapify = forwardRef((props, ref) => {
    * @description add mapmyindia map script file to project
    */
   const insertMapScript = () => {
-    injectMapScript(apiKey, libraries)
+    injectMapScript("f2febcb102cd6a7c1c8f91e3f53ed36a", libraries)
       .then(() => {
         mapInitSuccess();
         setIsMapLoadingFailed(false);
       })
-      .catch(() => {
-        console.error("MapmyIndia map library loading error!");
+      .catch((err) => {
+        console.error(err);
       });
   };
 
@@ -99,24 +98,46 @@ const GMapify = forwardRef((props, ref) => {
    * @description create map instance
    */
   const createMapInstance = (lat, lng) => {
-    if (!window.MapmyIndia) {
+    console.log(window);
+    if (!window.mappls) {
       console.error("MapmyIndia map library not found!");
       return;
     }
 
-    const center = new window.L.LatLng(lat, lng);
+    const center = new window.mappls.LatLng(lat, lng);
 
     // create mapmyindia map instance
     if (mapElemRef.current) {
       setMapInstance(
-        new window.MapmyIndia.Map(mapElemRef.current, {
+        new window.mappls.Map("map", {
           center,
-          zoom: 14,
+          zoomControl: true,
+          location: true,
           ...mapOptions
         })
       );
     }
   };
+
+  useEffect(() => {
+    if (!window.mappls) {
+      console.error("MapmyIndia map library not found!");
+      return;
+    }
+    const center = new window.mappls.LatLng(lat, lng);
+
+    if (mapElemRef.current) {
+      setMarkerInstance(
+        new window.mappls.Marker({
+          map: mapInstance,
+          position: center,
+          draggable: true,
+          fitbounds: true,
+          icon_url: "https://apis.mapmyindia.com/map_v3/1.png"
+        })
+      );
+    }
+  }, [mapInstance]);
 
   /**
    * @name addSearchBox
@@ -150,12 +171,13 @@ const GMapify = forwardRef((props, ref) => {
   const addEvents = () => {
     if (mapInstance && hasMarker && autoCenter) {
       // bind dragend event for fetch map center lat long
-      mapInstance.on("dragend", () => {
+      mapInstance.on("drag", () => {
         const center = mapInstance.getCenter();
+        console.log(center);
         setMapPosition(center.lat, center.lng);
+        markerInstance.setPosition(center);
       });
-
-      // bind zoom change event because always need to zoom from center
+      // // bind zoom change event because always need to zoom from center
       mapInstance.on("zoomend", () => {
         const center = mapInstance.getCenter();
         setMapPosition(center.lat, center.lng);
@@ -181,7 +203,7 @@ const GMapify = forwardRef((props, ref) => {
    * @description set mapmyindia map position
    */
   const setMapPosition = (lat, lng) => {
-    const position = new window.L.LatLng(lat, lng);
+    const position = new window.mappls.LatLng(lat, lng);
 
     mapInstance.panTo(position);
 
@@ -218,7 +240,7 @@ const GMapify = forwardRef((props, ref) => {
         query
       };
 
-      window.MapmyIndia.search(
+      window.mappls.search(
         options,
         (data) => {
           resolve(data);
@@ -302,8 +324,8 @@ const GMapify = forwardRef((props, ref) => {
     if (customMarkers) {
       let infowindow = null;
       customMarkers.forEach((item) => {
-        const marker = new window.L.Marker([item[0], item[1]], {
-          icon: window.L.icon({
+        const marker = new window.mappls.Map.Marker([item[0], item[1]], {
+          icon: window.mappls.Map.marker({
             iconUrl: markerIcon,
             iconSize: [32, 32]
           })
@@ -334,7 +356,7 @@ const GMapify = forwardRef((props, ref) => {
 
   useEffect(() => {
     if (mapInstance) {
-      setMapPosition(lat, lng);
+      setMapPosition(28.519467, 77.22315);
       addSearchBox();
       addMarkers();
     }
@@ -360,7 +382,7 @@ const GMapify = forwardRef((props, ref) => {
   }));
 
   return (
-    <div className={cx(styles.mapContainer, mapClassName)}>
+    <div className={cx(styles.mapContainer, "map")} id="map">
       <div ref={mapElemRef} className={styles.map}>
         {/* map coming here */}
       </div>
@@ -403,11 +425,7 @@ const GMapify = forwardRef((props, ref) => {
             >
               {searchResults.map((val, index) => {
                 return (
-                  <li
-                    key={index}
-                    index={index}
-                    className={cx(styles.mapItem, "mapItem")}
-                  >
+                  <li key={index} className={cx(styles.mapItem, "mapItem")}>
                     <div className={styles.searchH1}>{val.placeName}</div>
                     <div className={styles.searchH2}>{val.displayPlace}</div>
                   </li>
@@ -446,11 +464,11 @@ GMapify.propTypes = {
 
 // define default values of prop types
 GMapify.defaultProps = {
-  apiKey: "",
+  apiKey: "245b57d4-3684-4fd5-9f32-84d26f054bb6",
   lat: DEFAULT_LAT_LONG.lat,
   lng: DEFAULT_LAT_LONG.lng,
   mapOptions: {},
-  mapClassName: "",
+  mapClassName: "map",
   hasMarker: DEFAULT_HAS_MARKER,
   hasSearch: DEFAULT_HAS_SEARCH,
   autoCenter: true,

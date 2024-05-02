@@ -5,7 +5,7 @@ const resolveList = [];
 const rejectList = [];
 
 const getMapScript = (apiKey, libraries) =>
-  `https://apis.mapmyindia.com/advancedmaps/v1/${apiKey}/map_sdk?layer=vector&v=3.0&callback=initMapScript`;
+  `https://apis.mapmyindia.com/advancedmaps/v1/f2febcb102cd6a7c1c8f91e3f53ed36a/map_sdk?layer=vector&v=3.0&callback=initMapScript`;
 
 /**
  * @function notifyAll
@@ -32,7 +32,12 @@ const notifyAll = (isResolve) => {
  * @param {string} libraries
  * @description download map script file
  */
-const injectMapScript = (apiKey, libraries) => {
+/**
+ * @function injectMapScript
+ * @param {string} apiKey
+ * @description download map script file
+ */
+const injectMapScript = (apiKey) => {
   if (isMapLoaded) return Promise.resolve();
 
   return new Promise((resolve, reject) => {
@@ -68,7 +73,7 @@ const injectMapScript = (apiKey, libraries) => {
       scriptElem = document.createElement("script");
       scriptElem.addEventListener("load", mapScriptLoadEvent);
       scriptElem.addEventListener("error", mapScriptErrorEvent);
-      scriptElem.src = getMapScript(apiKey, libraries);
+      scriptElem.src = getMapScript(apiKey);
       scriptElem.setAttribute("id", "mapmyindia-map");
       document.querySelector("head").appendChild(scriptElem);
       isMapLoadPending = true;
@@ -84,7 +89,7 @@ const injectMapScript = (apiKey, libraries) => {
 const getAddressFromLatLong = (position) => {
   return new Promise((resolve, reject) => {
     fetch(
-      `https://apis.mapmyindia.com/advancedmaps/v1/${apiKey}/rev_geocode?lat=${position.lat}&lng=${position.lng}`,
+      `https://apis.mapmyindia.com/advancedmaps/v1/245b57d4-3684-4fd5-9f32-84d26f054bb6/rev_geocode?lat=${position.lat}&lng=${position.lng}`,
       {
         method: "GET",
         headers: {
@@ -108,4 +113,3 @@ const getAddressFromLatLong = (position) => {
 };
 
 export { getMapScript, injectMapScript, getAddressFromLatLong };
-
