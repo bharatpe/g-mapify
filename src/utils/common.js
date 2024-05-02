@@ -4,13 +4,13 @@ let scriptElem = null;
 const resolveList = [];
 const rejectList = [];
 
-const getMapScript = (appKey, libraries) =>
-  `https://maps.googleapis.com/maps/api/js?key=${appKey}&callback=initMapScript&libraries=${libraries}`;
+const getMapScript = (apiKey, libraries) =>
+  `https://apis.mapmyindia.com/advancedmaps/v1/${apiKey}/map_sdk?layer=vector&v=3.0&callback=initMapScript`;
 
 /**
  * @function notifyAll
  * @param {boolean} isResolve
- * @description notify all component to map script downloaded
+ * @description notify all components that the map script has been downloaded
  */
 const notifyAll = (isResolve) => {
   if (isResolve) {
@@ -19,7 +19,7 @@ const notifyAll = (isResolve) => {
     }
   } else {
     for (let i = 0; i < rejectList.length; i++) {
-      rejectList[i](new Error("map script not loaded"));
+      rejectList[i](new Error("Map script not loaded"));
     }
   }
   resolveList.length = 0;
@@ -28,11 +28,11 @@ const notifyAll = (isResolve) => {
 
 /**
  * @function injectMapScript
- * @param {string} appKey
+ * @param {string} apiKey
  * @param {string} libraries
  * @description download map script file
  */
-const injectMapScript = (appKey, libraries) => {
+const injectMapScript = (apiKey, libraries) => {
   if (isMapLoaded) return Promise.resolve();
 
   return new Promise((resolve, reject) => {
@@ -68,8 +68,8 @@ const injectMapScript = (appKey, libraries) => {
       scriptElem = document.createElement("script");
       scriptElem.addEventListener("load", mapScriptLoadEvent);
       scriptElem.addEventListener("error", mapScriptErrorEvent);
-      scriptElem.src = getMapScript(appKey, libraries);
-      scriptElem.setAttribute("id", "google-map");
+      scriptElem.src = getMapScript(apiKey, libraries);
+      scriptElem.setAttribute("id", "mapmyindia-map");
       document.querySelector("head").appendChild(scriptElem);
       isMapLoadPending = true;
     }
@@ -79,24 +79,33 @@ const injectMapScript = (appKey, libraries) => {
 /**
  * @name getAddressFromLatLong
  * @param {*} position
- * @description get address from Lat Logn (reverse geocoding)
+ * @description get address from Lat Long (reverse geocoding)
  */
 const getAddressFromLatLong = (position) => {
-  const geocoder = new window.google.maps.Geocoder();
   return new Promise((resolve, reject) => {
-    geocoder.geocode({ location: position }, function (results, status) {
-      if (status === "OK") {
-        if (results[0]) {
-          resolve(results[0], status);
-        } else {
-          // eslint-disable-next-line prefer-promise-reject-errors
-          reject(-1);
+    fetch(
+      `https://apis.mapmyindia.com/advancedmaps/v1/${apiKey}/rev_geocode?lat=${position.lat}&lng=${position.lng}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer YOUR_MAPMYINDIA_REST_API_KEY"
         }
-      } else {
-        reject(status);
       }
-    });
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.responseCode === 200) {
+          resolve(data.results[0]);
+        } else {
+          reject(data.error_message);
+        }
+      })
+      .catch((error) => {
+        reject(error);
+      });
   });
 };
 
 export { getMapScript, injectMapScript, getAddressFromLatLong };
+
