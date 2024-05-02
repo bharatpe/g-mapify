@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useRef, useEffect } from "react";
-import { GMapify, AddressFormatter } from "g-mapify";
-import "g-mapify/dist/index.css";
+import { GMapify, AddressFormatter } from "@bp/g-mapify";
+import "@bp/g-mapify/index.css";
 import "./index.css";
 // import InputDefault from './components/Input';
 

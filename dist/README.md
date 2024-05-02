@@ -10,13 +10,13 @@ Flexible react google map with more options of search, pick & select.
 # Getting Started
 
 ```javascript
-yarn add @bp/g-mapify
+yarn add g-mapify
 ```
 
 or
 
 ```javascript
-npm i @bp/g-mapify
+npm i g-mapify
 ```
 
 
@@ -41,8 +41,8 @@ Basic use:
 ## Example with options (Search Map)
 ```javascript
 import  React from  'react';
-import { GMapify } from  '@bp/g-mapify';
-import  '@bp/g-mapify/dist/index.css';
+import { GMapify } from  'g-mapify';
+import  'g-mapify/dist/index.css';
 
 const  App = () => {
     const  onMapSelect = (status, data) => console.warn(status, data);
@@ -60,8 +60,8 @@ const  App = () => {
 ## Example with multiple markers
 ```javascript
 import  React from  'react';
-import { GMapify } from  '@bp/g-mapify';
-import  '@bp/g-mapify/dist/index.css';
+import { GMapify } from  'g-mapify';
+import  'g-mapify/dist/index.css';
 
 const  App = () => {
 
@@ -117,8 +117,8 @@ Support ref to access some functions directly.
 
 ```javascript
     import  React from  'react';
-    import { GMapify } from  '@bp/g-mapify';
-    import  '@bp/g-mapify/dist/index.css';
+    import { GMapify } from  'g-mapify';
+    import  'g-mapify/dist/index.css';
     
     const  App = () => {
         const mapRef = useRef();
@@ -153,7 +153,7 @@ Functions are accessible directly:
 ## Address Formatter
 You can get City, Pincode, State etc. from *address_components* using **addressFormatter** method. This method transfrom *address_components* array data into *object*.
 ```javascript
-import { GMapify, AddressFormatter } from  '@bp/g-mapify'
+import { GMapify, AddressFormatter } from  'g-mapify'
 
 const  onMapSelect = (status, data) => {
     if (status) {
