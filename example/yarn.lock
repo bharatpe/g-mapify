@@ -1109,6 +1109,11 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@bp/g-mapify@^3.0.0":
+  version "3.0.0"
+  resolved "https://npm.bharatpe.in/@bp/g-mapify/-/g-mapify-3.0.0.tgz#e88ad0ffaa9559418dd1fd652f4faf31d63ffdfb"
+  integrity sha512-WOr3GonRR3Ildlmb3VJUAVBANOCopTiXqO57rEHB9uRW8zDMtjObPJxA6A4ih6LMPszNkOjAyuWNQzbc+cIv7g==
+
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@cnakazawa/watch/-/watch-1.0.4.tgz#f864ae85004d0fcab6f50be9141c4da368d1656a"
@@ -4787,9 +4792,6 @@ functional-red-black-tree@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
-
-"g-mapify@file:..":
-  version "1.0.0"
 
 gensync@^1.0.0-beta.1:
   version "1.0.0-beta.1"
