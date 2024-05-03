@@ -3,7 +3,8 @@ import React, {
   useEffect,
   useRef,
   forwardRef,
-  useImperativeHandle
+  useImperativeHandle,
+  useCallback
 } from "react";
 import ReactDOM from "react-dom";
 import styles from "./style.css";
@@ -16,7 +17,6 @@ import {
   SEARCH_STATE,
   MSG_CONST,
   DEFAULT_LAT_LONG,
-  DEFAULT_MAP_OPTIONS,
   DEFAULT_DEBOUNCE_TIME,
   DEFAULT_HAS_MARKER,
   DEFAULT_HAS_SEARCH,
@@ -28,9 +28,8 @@ import SearchComponent from "../components/SearchComponent";
 
 const GMapify = forwardRef((props, ref) => {
   const {
-    appKey,
+    apiKey,
     mapOptions,
-    mapClassName,
     hasMarker,
     hasSearch,
     mapSearchPlace,
@@ -56,19 +55,20 @@ const GMapify = forwardRef((props, ref) => {
   const [mapLastPosition, setMapLastPosition] = useState({});
   const [addressInput, setAddressInput] = useState("");
   const [mapInstance, setMapInstance] = useState(null);
+  const [markerInstance, setMarkerInstance] = useState(null);
 
   if (customMarkers && customMarkers.length > 0) {
     lat = customMarkers[0][0];
     lng = customMarkers[0][1];
   }
 
-  // store google map render element instance
+  // store mapmyindia map render element instance
   const mapElemRef = useRef(null);
   let defaultSearchPlace = useRef(null);
 
   /**
    * @name mapInitSuccess
-   * @description google map script file added successfully
+   * @description mapmyindia map script file added successfully
    */
   const mapInitSuccess = () => {
     if (mapSearchPlace) {
@@ -79,22 +79,16 @@ const GMapify = forwardRef((props, ref) => {
 
   /**
    * @name insertMapScript
-   * @description add google map script file to project
+   * @description add mapmyindia map script file to project
    */
   const insertMapScript = () => {
-    // error occured in Google Map loading
-    window.gm_authFailure = () => {
-      setIsMapLoadingFailed(true);
-      sendToParent(false, { message: MSG_CONST.MAP_NOT_LOADED }, -1);
-    };
-
-    injectMapScript(appKey, libraries)
+    injectMapScript("f2febcb102cd6a7c1c8f91e3f53ed36a", libraries)
       .then(() => {
         mapInitSuccess();
         setIsMapLoadingFailed(false);
       })
-      .catch(() => {
-        console.error("google map library loading error!");
+      .catch((err) => {
+        console.error(err);
       });
   };
 
@@ -105,27 +99,35 @@ const GMapify = forwardRef((props, ref) => {
    * @description create map instance
    */
   const createMapInstance = (lat, lng) => {
-    if (!window.google) {
-      console.error("google map library not found!");
+    console.log(window);
+    if (!window.mappls) {
+      console.error("MapmyIndia map library not found!");
       return;
     }
+    console.log("aaa");
 
-    const center = {
-      center: new window.google.maps.LatLng(lat, lng)
-    };
-
-    // create google map instance
+    // const center = new window.mappls.LatLng(lat, lng);
+    // console.log(...center);
+    const map = new window.mappls.Map("map", {
+      center: [28.519467, 77.22315],
+      zoomControl: true,
+      location: true,
+      ...mapOptions
+    });
+    console.log(map);
+    // create mapmyindia map instance
     if (mapElemRef.current) {
-      setMapInstance(
-        new window.google.maps.Map(mapElemRef.current, {
-          ...center,
-          ...DEFAULT_MAP_OPTIONS,
-          ...mapOptions
+      setMapInstance(map);
+      setMarkerInstance(
+        new window.mappls.Marker({
+          map: map,
+          position: new window.mappls.LatLng(lat, lng),
+          fitbounds: true,
+          icon_url: "https://apis.mapmyindia.com/map_v3/1.png"
         })
       );
     }
   };
-
   /**
    * @name addSearchBox
    * @description add search box to map
@@ -151,32 +153,46 @@ const GMapify = forwardRef((props, ref) => {
     }
   };
 
+  const dragEnd = useCallback(() => {
+    console.log("dragend");
+    const center = mapInstance.getCenter();
+    setMapPosition(center.lat, center.lng);
+    markerInstance.setPosition(center);
+  });
+
+  const drag = useCallback(() => {
+    const center = mapInstance.getCenter();
+
+    markerInstance.setPosition(center);
+  });
+
   /**
    * @name addEvents
-   * @description add events to google map
+   * @description add events to mapmyindia map
    */
   const addEvents = () => {
-    if (mapInstance && hasMarker && autoCenter) {
+    if (mapInstance) {
       // bind dragend event for fetch map center lat long
-      mapInstance.addListener("dragend", () => {
-        setMapPosition(mapInstance.center.lat(), mapInstance.center.lng());
-      });
 
+      mapInstance.on("dragend", dragEnd);
+      mapInstance.on("drag", drag);
       // bind zoom change event because always need to zoom from center
-      mapInstance.addListener("zoom_changed", () => {
-        setMapPosition(mapLastPosition.lat, mapLastPosition.lng);
-      });
+      // mapInstance.on("zoomend", () => {
+      //   const center = mapInstance.getCenter();
+      //   setMapPosition(center.lat, center.lng);
+      // });
     }
   };
 
   /**
    * @name removeEvents
-   * @description remove events from google map
+   * @description remove events from mapmyindia map
    */
   const removeEvents = () => {
-    if (window.google && mapInstance) {
-      window.google.maps.event.clearListeners(mapInstance, "dragend");
-      window.google.maps.event.clearListeners(mapInstance, "zoom_changed");
+    if (mapInstance) {
+      console.log("remove");
+      mapInstance.off("dragend", dragEnd);
+      mapInstance.off("drag", drag);
     }
   };
 
@@ -184,15 +200,11 @@ const GMapify = forwardRef((props, ref) => {
    * @name setMapPosition
    * @param {Float} lat
    * @param {Float} lng
-   * @description set google map position
+   * @description set mapmyindia map position
    */
   const setMapPosition = (lat, lng) => {
-    const position = {
-      lat: lat,
-      lng: lng
-    };
-
-    mapInstance.setCenter(position);
+    const position = new window.mappls.LatLng(lat, lng);
+    console.log(position);
     mapInstance.panTo(position);
 
     // get address only when previous and current lat/lng different
@@ -211,7 +223,6 @@ const GMapify = forwardRef((props, ref) => {
         }
       };
       sendToParent(true, data, true);
-
     }
 
     // save map last position
@@ -221,24 +232,23 @@ const GMapify = forwardRef((props, ref) => {
   /**
    * @name searchByQuery
    * @param {String} query
-   * @description search google map address by query
+   * @description search mapmyindia map address by query
    */
   const searchByQuery = (query) => {
     return new Promise((resolve, reject) => {
-      const request = {
-        query,
-        fields: ["name", "formatted_address", "geometry"]
+      const options = {
+        query
       };
 
-      const service = new window.google.maps.places.PlacesService(mapInstance);
-
-      service.textSearch(request, (results, status) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-          resolve(results, status);
-        } else {
-          reject(status);
+      window.mappls.search(
+        options,
+        (data) => {
+          resolve(data);
+        },
+        (error) => {
+          reject(error);
         }
-      });
+      );
     });
   };
 
@@ -298,18 +308,15 @@ const GMapify = forwardRef((props, ref) => {
    * @description select map address item
    */
   const selectMapItem = (event) => {
-    const closestLiElem = event.target && event.target.closest(".mapItem");
-    if (closestLiElem.hasAttribute("index")) {
+    const closestLiElem = event.target.closest(".mapItem");
+    if (closestLiElem && closestLiElem.hasAttribute("index")) {
       const selectedVal =
         searchResults[Number(closestLiElem.getAttribute("index"))];
 
       setShowMapSearch(false);
 
       // set marker and map position according to selected location
-      setMapPosition(
-        selectedVal.geometry.location.lat(),
-        selectedVal.geometry.location.lng()
-      );
+      setMapPosition(selectedVal.latitude, selectedVal.longitude);
     }
   };
 
@@ -317,41 +324,35 @@ const GMapify = forwardRef((props, ref) => {
     if (customMarkers) {
       let infowindow = null;
       customMarkers.forEach((item) => {
-        // eslint-disable-next-line no-new
-        const marker = new window.google.maps.Marker({
-          position: new window.google.maps.LatLng(item[0], item[1]),
-          map: mapInstance,
-          title: "Hello World!",
-          visible: true,
-          icon: markerIcon
-        });
+        const marker = new window.mappls.Map.Marker([item[0], item[1]], {
+          icon: window.mappls.Map.marker({
+            iconUrl: markerIcon,
+            iconSize: [32, 32]
+          })
+        }).addTo(mapInstance);
 
         if (item[2]) {
-          marker.addListener("click", () => {
+          marker.on("click", () => {
             if (allowSinglePopup && infowindow) {
-              infowindow.close();
+              infowindow.remove();
             }
 
-            infowindow = new window.google.maps.InfoWindow({
-              content: item[2]
-            });
-            infowindow.open(mapInstance, marker);
+            infowindow = window.L.popup().setContent(item[2]);
+            marker.bindPopup(infowindow).openPopup();
           });
         }
-
-        marker.setMap(mapInstance);
       });
     }
   };
 
   useEffect(() => {
-    if (appKey) {
-      // call to insert google map script
+    if (apiKey) {
+      // call to insert mapmyindia map script
       insertMapScript();
     } else {
-      console.error("google map appKey not found!!!");
+      console.error("MapmyIndia map apiKey not found!!!");
     }
-  }, [appKey]);
+  }, [apiKey]);
 
   useEffect(() => {
     if (mapInstance) {
@@ -381,9 +382,9 @@ const GMapify = forwardRef((props, ref) => {
   }));
 
   return (
-    <div className={cx(styles.mapContainer, mapClassName)}>
+    <div className={cx(styles.mapContainer, "map")} id="map">
       <div ref={mapElemRef} className={styles.map}>
-        {/* map comming here */}
+        {/* map coming here */}
       </div>
 
       {/* map marker icon */}
@@ -402,7 +403,6 @@ const GMapify = forwardRef((props, ref) => {
         </div>
       )}
 
-      {/* Render childrens */}
       {children}
 
       {showMapSearch && !isMapLoadingFailed && (
@@ -424,15 +424,9 @@ const GMapify = forwardRef((props, ref) => {
             >
               {searchResults.map((val, index) => {
                 return (
-                  <li
-                    key={index}
-                    index={index}
-                    className={cx(styles.mapItem, "mapItem")}
-                  >
-                    <div className={styles.searchH1}>{val.name}</div>
-                    <div className={styles.searchH2}>
-                      {val.formatted_address}
-                    </div>
+                  <li key={index} className={cx(styles.mapItem, "mapItem")}>
+                    <div className={styles.searchH1}>{val.placeName}</div>
+                    <div className={styles.searchH2}>{val.displayPlace}</div>
                   </li>
                 );
               })}
@@ -446,7 +440,7 @@ const GMapify = forwardRef((props, ref) => {
 
 // define component prop types
 GMapify.propTypes = {
-  appKey: PropTypes.string,
+  apiKey: PropTypes.string,
   lat: PropTypes.number,
   lng: PropTypes.number,
   mapOptions: PropTypes.object,
@@ -469,7 +463,7 @@ GMapify.propTypes = {
 
 // define default values of prop types
 GMapify.defaultProps = {
-  appKey: "",
+  apiKey: "245b57d4-3684-4fd5-9f32-84d26f054bb6",
   lat: DEFAULT_LAT_LONG.lat,
   lng: DEFAULT_LAT_LONG.lng,
   mapOptions: {},

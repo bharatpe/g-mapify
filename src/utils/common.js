@@ -5,7 +5,7 @@ const resolveList = [];
 const rejectList = [];
 
 const getMapScript = (appKey, libraries) =>
-  `https://maps.googleapis.com/maps/api/js?key=${appKey}&callback=initMapScript&libraries=${libraries}`;
+  `https://apis.mapmyindia.com/advancedmaps/v1/f2febcb102cd6a7c1c8f91e3f53ed36a/map_sdk?layer=vector&v=3.0&callback=initMapScript`;
 
 /**
  * @function notifyAll
@@ -68,8 +68,8 @@ const injectMapScript = (appKey, libraries) => {
       scriptElem = document.createElement("script");
       scriptElem.addEventListener("load", mapScriptLoadEvent);
       scriptElem.addEventListener("error", mapScriptErrorEvent);
-      scriptElem.src = getMapScript(appKey, libraries);
-      scriptElem.setAttribute("id", "google-map");
+      scriptElem.src = getMapScript("f2febcb102cd6a7c1c8f91e3f53ed36a");
+      scriptElem.setAttribute("id", "mapmyindia-map");
       document.querySelector("head").appendChild(scriptElem);
       isMapLoadPending = true;
     }
