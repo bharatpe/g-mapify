@@ -1,5 +1,6 @@
 declare module '@bp/g-mapify' {
 	const GMapify: any;
 	const AddressFormatter: any;
-	export { GMapify, AddressFormatter };
+	const MapMyIndia: any;
+	export { GMapify, AddressFormatter, MapMyIndia };
 }
