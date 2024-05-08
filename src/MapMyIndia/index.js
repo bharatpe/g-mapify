@@ -131,7 +131,6 @@ const MapMyIndia = forwardRef((props, ref) => {
             lat: lat,
             lng: lng
           },
-          draggable: true,
           // fitbounds: true,
           icon_url: "https://apis.mapmyindia.com/map_v3/1.png"
         })
