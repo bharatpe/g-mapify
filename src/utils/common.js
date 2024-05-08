@@ -5,7 +5,10 @@ const resolveList = [];
 const rejectList = [];
 
 const getMapScript = (appKey, libraries) =>
-  `https://apis.mapmyindia.com/advancedmaps/v1/f2febcb102cd6a7c1c8f91e3f53ed36a/map_sdk?layer=vector&v=3.0&callback=initMapScript`;
+  `https://maps.googleapis.com/maps/api/js?key=${appKey}&callback=initMapScript&libraries=${libraries}`;
+
+const getMMIMapScript = (appKey, libraries) =>
+  `https://apis.mapmyindia.com/advancedmaps/v1/${appKey}/map_sdk?layer=vector&v=3.0&callback=initMapScript`;
 
 /**
  * @function notifyAll
@@ -38,7 +41,7 @@ const injectMapScript = (appKey, libraries) => {
   return new Promise((resolve, reject) => {
     if (!window.initMapScript) {
       window.initMapScript = () => {
-        console.log("Map script successful");
+        console.log("Map script successfull");
         notifyAll(true);
       };
     }
@@ -68,8 +71,52 @@ const injectMapScript = (appKey, libraries) => {
       scriptElem = document.createElement("script");
       scriptElem.addEventListener("load", mapScriptLoadEvent);
       scriptElem.addEventListener("error", mapScriptErrorEvent);
-      scriptElem.src = getMapScript("f2febcb102cd6a7c1c8f91e3f53ed36a");
-      scriptElem.setAttribute("id", "mapmyindia-map");
+      scriptElem.src = getMapScript(appKey, libraries);
+      scriptElem.setAttribute("id", "google-map");
+      document.querySelector("head").appendChild(scriptElem);
+      isMapLoadPending = true;
+    }
+  });
+};
+
+const injectMMIMapScript = (appKey, libraries) => {
+  if (isMapLoaded) return Promise.resolve();
+
+  return new Promise((resolve, reject) => {
+    if (!window.initMapScript) {
+      window.initMapScript = () => {
+        console.log("Map script successfull");
+        notifyAll(true);
+      };
+    }
+
+    resolveList.push(resolve);
+    rejectList.push(reject);
+
+    function mapScriptLoadEvent() {
+      isMapLoaded = true;
+      isMapLoadPending = false;
+      scriptElem.setAttribute("loaded", "true");
+      scriptElem.removeEventListener("load", mapScriptLoadEvent);
+      scriptElem.removeEventListener("error", mapScriptErrorEvent);
+    }
+
+    function mapScriptErrorEvent() {
+      isMapLoaded = false;
+      isMapLoadPending = false;
+      scriptElem.setAttribute("loaded", "false");
+      scriptElem.removeEventListener("error", mapScriptErrorEvent);
+      scriptElem.removeEventListener("load", mapScriptLoadEvent);
+      document.head.removeChild(scriptElem);
+      notifyAll(false);
+    }
+
+    if (!isMapLoadPending) {
+      scriptElem = document.createElement("script");
+      scriptElem.addEventListener("load", mapScriptLoadEvent);
+      scriptElem.addEventListener("error", mapScriptErrorEvent);
+      scriptElem.src = getMMIMapScript(appKey);
+      scriptElem.setAttribute("id", "google-map");
       document.querySelector("head").appendChild(scriptElem);
       isMapLoadPending = true;
     }
@@ -99,4 +146,9 @@ const getAddressFromLatLong = (position) => {
   });
 };
 
-export { getMapScript, injectMapScript, getAddressFromLatLong };
+export {
+  getMapScript,
+  injectMapScript,
+  getAddressFromLatLong,
+  injectMMIMapScript
+};
