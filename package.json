@@ -1,6 +1,6 @@
 {
   "name": "@bp/g-mapify",
-  "version": "5.0.0",
+  "version": "5.0.3",
   "description": "Flexible react google map with more options of search, pick & select.",
   "author": "BharatPe TM",
   "license": "ISC",

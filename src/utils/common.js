@@ -7,6 +7,9 @@ const rejectList = [];
 const getMapScript = (appKey, libraries) =>
   `https://maps.googleapis.com/maps/api/js?key=${appKey}&callback=initMapScript&libraries=${libraries}`;
 
+const getMMIMapScript = (appKey, libraries) =>
+  `https://apis.mapmyindia.com/advancedmaps/v1/${appKey}/map_sdk?layer=vector&v=3.0&callback=initMapScript`;
+
 /**
  * @function notifyAll
  * @param {boolean} isResolve
@@ -38,7 +41,7 @@ const injectMapScript = (appKey, libraries) => {
   return new Promise((resolve, reject) => {
     if (!window.initMapScript) {
       window.initMapScript = () => {
-        console.log("Map script successful");
+        console.log("Map script successfull");
         notifyAll(true);
       };
     }
@@ -76,6 +79,50 @@ const injectMapScript = (appKey, libraries) => {
   });
 };
 
+const injectMMIMapScript = (appKey, libraries) => {
+  if (isMapLoaded) return Promise.resolve();
+
+  return new Promise((resolve, reject) => {
+    if (!window.initMapScript) {
+      window.initMapScript = () => {
+        console.log("Map script successfull");
+        notifyAll(true);
+      };
+    }
+
+    resolveList.push(resolve);
+    rejectList.push(reject);
+
+    function mapScriptLoadEvent() {
+      isMapLoaded = true;
+      isMapLoadPending = false;
+      scriptElem.setAttribute("loaded", "true");
+      scriptElem.removeEventListener("load", mapScriptLoadEvent);
+      scriptElem.removeEventListener("error", mapScriptErrorEvent);
+    }
+
+    function mapScriptErrorEvent() {
+      isMapLoaded = false;
+      isMapLoadPending = false;
+      scriptElem.setAttribute("loaded", "false");
+      scriptElem.removeEventListener("error", mapScriptErrorEvent);
+      scriptElem.removeEventListener("load", mapScriptLoadEvent);
+      document.head.removeChild(scriptElem);
+      notifyAll(false);
+    }
+
+    if (!isMapLoadPending) {
+      scriptElem = document.createElement("script");
+      scriptElem.addEventListener("load", mapScriptLoadEvent);
+      scriptElem.addEventListener("error", mapScriptErrorEvent);
+      scriptElem.src = getMMIMapScript(appKey);
+      scriptElem.setAttribute("id", "google-map");
+      document.querySelector("head").appendChild(scriptElem);
+      isMapLoadPending = true;
+    }
+  });
+};
+
 /**
  * @name getAddressFromLatLong
  * @param {*} position
@@ -99,4 +146,9 @@ const getAddressFromLatLong = (position) => {
   });
 };
 
-export { getMapScript, injectMapScript, getAddressFromLatLong };
+export {
+  getMapScript,
+  injectMapScript,
+  getAddressFromLatLong,
+  injectMMIMapScript
+};
