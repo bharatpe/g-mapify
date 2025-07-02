@@ -1,13 +1,18 @@
+@font-face {
+  font-family: 'Regular';
+  src: url('https://d30gqtvesfc1d5.cloudfront.net/fonts/v3/poppins/Regular');
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-family: Regular;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code, textarea {
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+  font-family: Regular
 }
 
 
