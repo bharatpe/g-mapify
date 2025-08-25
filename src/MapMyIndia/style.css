@@ -1,0 +1,108 @@
+.mapContainer {
+	position: relative;
+}
+
+.map {
+	width: 100%;
+	/* min-height: 200px;
+	height: inherit; */
+}
+
+.address-card {
+	padding: 10px;
+	position: absolute;
+	bottom: 70px;
+	width: calc(100% - 32px);
+	justify-content: flex-start;
+}
+
+.map-container .address-card input {
+	outline: none;
+	border: none;
+}
+
+.map-container .address-card .geo-address {
+	max-height: 32px;
+	overflow: auto;
+}
+
+.markerIcon {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 25px;
+	height: 40px;
+	margin: -40px 0 0 -12px;
+	background-size: contain;
+	background-repeat: no-repeat;
+}
+
+.defaultSearchPosition {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+	width: 100%;
+	max-width: 500px;
+    transform: translate(-50%, -120px);
+}
+
+.defaultSearchPosition:before {
+	content: "";
+	position: absolute;
+    width: 0px;
+	height: 30px;
+	border: 1px dashed #0395ad;
+    margin-left: -1px;
+    left: 50%;
+    top: 49px;
+}
+
+.defaultSearchPosition:after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    margin-left: -11px;
+    left: 50%;
+    top: 49px;
+    box-sizing: border-box;
+    border: 7px solid #d2bcbc;
+    border-color: transparent transparent #ffffff #ffffff;
+    transform-origin: 0 0;
+    transform: rotate(-45deg);
+    box-shadow: -4px 3px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.searchLoading {
+	width: 100%;
+	text-align: center;
+}
+
+.mapItemUL {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	text-align: left;
+}
+
+.mapItem {
+	border-bottom: 1px solid #e0e0e0;
+	padding: 8px 0;
+}
+
+.mapItem:nth-last-child(1) {
+	border-bottom: 1px solid transparent;
+}
+
+.searchH1 {
+	font-size: 0.875rem;
+	margin-bottom: 2px;
+}
+
+.searchH2 {
+	color: #8d8b97;
+	font-size: 0.75rem;
+}
